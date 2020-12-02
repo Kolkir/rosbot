@@ -5,10 +5,10 @@ Get Docker image:
 `docker pull osrf/ros:noetic-desktop-full`
 
 Start detached container, with mounted workspace directory, spcified name, shared network, web cam, and X11 :
-
-`cd my_workspace_directory`
-`docker run --device=/dev/video0:/dev/video0 --net=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -dt --name robot_env --restart unless-stopped -v `pwd`:/root/workspace osrf/ros:noetic-desktop-full`
-
+~~~
+cd my_workspace_directory`
+docker run --device=/dev/video0:/dev/video0 --net=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -dt --name robot_env --restart unless-stopped -v `pwd`:/root/workspace osrf/ros:noetic-desktop-full
+~~~
 Connect to the contatiner:
 
 `docker exec -it robot_env bash`
@@ -22,12 +22,13 @@ you can also stop and then start container again.
 ### Start development
 
 Initialize workspace:
-`cd root/workspace`
-`source /opt/ros/noetic/setup.bash`
-`mkdir src`
-`catkin_make`
-`source devel/setup.bash`
-
+~~~
+cd root/workspace
+source /opt/ros/noetic/setup.bash
+mkdir src
+catkin_make
+source devel/setup.bash
+~~~
 Check workspace:
 
 `echo $ROS_PACKAGE_PATH`
@@ -49,10 +50,12 @@ alias cm='cd /root/workspace && catkin_make'
 ~~~
 
 ### Install IDE
-`apt-get update`
-`apt-get install qtcreator`
-`apt-get install vim`
-`apt-get install tmux`
+~~~
+apt-get update
+apt-get install qtcreator
+apt-get install vim
+apt-get install tmux
+~~~
 
 ### Install ROS packages
 
@@ -64,7 +67,9 @@ or use `rosdep install package_name`
 
 http://wiki.ros.org/stereo_image_proc/Tutorials/Using%20OpenCV%20for%20Image%20Processing#cv_camera
 
+~~~
 cd /root/workspace/src
 catkin_create_pkg main_camera cv_camera
 
 roslaunch main_camera main_camera.launch main_camera_id:=1
+~~~
