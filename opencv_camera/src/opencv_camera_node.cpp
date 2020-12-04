@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
     ROS_ERROR_STREAM("Using default frame rate param");
   }
 
-  cv::VideoCapture capture(camera_index);
+  cv::VideoCapture capture(camera_index, cv::CAP_V4L2);
   if (!capture.isOpened()) {
     ROS_ERROR_STREAM("Failed to open camera with index " << camera_index
                                                          << "!");
