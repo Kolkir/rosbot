@@ -14,9 +14,27 @@ Update apt-get:
 
 Install ROS:
 
-1. sudo apt-get install ros-noetic-robot
+~~~
+sudo apt-get install ros-noetic-robot
+sudo apt-get install python3-rosdep
+sudo rosdep init
+rosdep update
+sudo apt-get install ros-noetic-cv-camera
+~~~
 
 Configure ROS master URL:
 
 1. `export ROS_MASTER_URI=http://xxx.xxx.xxx.xxx:11311`
 
+Setup workspace:
+
+~~~
+source /opt/ros/noetic/setup.sh
+mkdir ros_workspace
+cd ros_workspace/
+catkin_make
+mkdir src
+catkin_make
+cd src
+git clone https://github.com/Kolkir/rosbot.git
+~~~
