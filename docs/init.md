@@ -53,9 +53,12 @@ alias cm='cd /root/workspace && catkin_make'
 ~~~
 apt-get update
 apt-get install qtcreator
+apt-get install libclang-common-8-dev
 apt-get install vim
 apt-get install tmux
 ~~~
+
+The `libclang-common-8-dev` is required for qtCreator clang code model to work properly.
 
 ### Install ROS packages
 
