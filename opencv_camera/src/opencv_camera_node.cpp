@@ -4,54 +4,71 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/highgui/highgui.hpp>
 
+struct CameraParams {
+  int camera_index = 0;
+  double frame_width = 0.0;
+  double frame_height = 0.0;
+  double frame_rate = 0.0;
+};
+
+CameraParams ReadCameraParams(ros::NodeHandle& node_handler) {
+  CameraParams params;
+
+  if (!node_handler.param("/opencv_camera/camera_index", params.camera_index,
+                          0)) {
+    ROS_ERROR_STREAM("Using default camera index param");
+  } else {
+    ROS_WARN_STREAM("Camera index param = " << params.camera_index);
+  }
+
+  if (!node_handler.param("/opencv_camera/frame_width", params.frame_width,
+                          640.0)) {
+    ROS_ERROR_STREAM("Using default frame width param");
+  } else {
+    ROS_WARN_STREAM("Frame width param = " << params.frame_width);
+  }
+
+  if (!node_handler.param("/opencv_camera/frame_height", params.frame_height,
+                          480.0)) {
+    ROS_ERROR_STREAM("Using default frame height param");
+  } else {
+    ROS_WARN_STREAM("Frame height param = " << params.frame_height);
+  }
+
+  if (!node_handler.param("/opencv_camera/frame_rate", params.frame_rate,
+                          15.0)) {
+    ROS_ERROR_STREAM("Using default frame rate param");
+  } else {
+    ROS_WARN_STREAM("Frame rate param = " << params.frame_rate);
+  }
+
+  return params;
+}
+
 int main(int argc, char** argv) {
   ros::init(argc, argv, "opencv_camera");
   ros::NodeHandle node_handler;
 
-  int camera_index = 0;
-  if (!node_handler.param("/opencv_camera/camera_index", camera_index, 0)) {
-    ROS_ERROR_STREAM("Using default camera index param");
-  } else {
-    ROS_WARN_STREAM("Camera index param = " << camera_index);
-  }
+  CameraParams params = ReadCameraParams(node_handler);
 
-  double frame_width = 0;
-  if (!node_handler.param("/opencv_camera/frame_width", frame_width, 640.0)) {
-    ROS_ERROR_STREAM("Using default frame width param");
-  } else {
-    ROS_WARN_STREAM("Frame width param = " << frame_width);
-  }
-
-  double frame_height = 0;
-  if (!node_handler.param("/opencv_camera/frame_height", frame_height, 480.0)) {
-    ROS_ERROR_STREAM("Using default frame height param");
-  } else {
-    ROS_WARN_STREAM("Frame height param = " << frame_height);
-  }
-
-  double frame_rate = 0.0;
-  if (!node_handler.param("/opencv_camera/frame_rate", frame_rate, 15.0)) {
-    ROS_ERROR_STREAM("Using default frame rate param");
-  }
-
-  cv::VideoCapture capture(camera_index, cv::CAP_V4L2);
+  cv::VideoCapture capture(params.camera_index, cv::CAP_V4L2);
   if (!capture.isOpened()) {
-    ROS_ERROR_STREAM("Failed to open camera with index " << camera_index
+    ROS_ERROR_STREAM("Failed to open camera with index " << params.camera_index
                                                          << "!");
     ros::shutdown();
     exit(1);
   }
 
-  if (!capture.set(cv::CAP_PROP_FRAME_WIDTH, frame_width)) {
-    ROS_ERROR_STREAM("Failed to set frame with " << frame_width);
+  if (!capture.set(cv::CAP_PROP_FRAME_WIDTH, params.frame_width)) {
+    ROS_ERROR_STREAM("Failed to set frame with " << params.frame_width);
   }
 
-  if (!capture.set(cv::CAP_PROP_FRAME_HEIGHT, frame_height)) {
-    ROS_ERROR_STREAM("Failed to set frame height " << frame_height);
+  if (!capture.set(cv::CAP_PROP_FRAME_HEIGHT, params.frame_height)) {
+    ROS_ERROR_STREAM("Failed to set frame height " << params.frame_height);
   }
 
-  if (!capture.set(cv::CAP_PROP_FPS, frame_rate)) {
-    ROS_ERROR_STREAM("Failed to set frame rate " << frame_rate);
+  if (!capture.set(cv::CAP_PROP_FPS, params.frame_rate)) {
+    ROS_ERROR_STREAM("Failed to set frame rate " << params.frame_rate);
   }
 
   cv::Mat frame;
@@ -68,14 +85,13 @@ int main(int argc, char** argv) {
   image_transport::ImageTransport it(node_handler);
 
   // Publish to the /camera topic
-  image_transport::Publisher pub_frame = it.advertise("opencv_camera", 1);
+  image_transport::Publisher pub_frame = it.advertise("opencv_camera/raw", 1);
 
   sensor_msgs::ImagePtr msg;
 
-  ros::Rate loop_rate(frame_rate);
+  ros::Rate loop_rate(params.frame_rate);
 
   while (node_handler.ok()) {
-    // Load image
     capture >> frame;
 
     if (frame.empty()) {
@@ -84,20 +100,8 @@ int main(int argc, char** argv) {
       exit(1);
     }
 
-    // Convert image from cv::Mat (OpenCV) type to sensor_msgs/Image (ROS) type
-    // and publish
     msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
     pub_frame.publish(msg);
-    /*
-    Cv_bridge can selectively convert color and depth information. In order to
-    use the specified feature encoding, there is a centralized coding form:
-      Mono8: CV_8UC1, grayscale image
-      Mono16: CV_16UC1, 16-bit grayscale image
-      Bgr8: CV_8UC3 with color information and the order of colors is BGR order
-      Rgb8: CV_8UC3 with color information and the order of colors is RGB order
-      Bgra8: CV_8UC4, BGR color image with alpha channel
-      Rgba8: CV_8UC4, CV, RGB color image with alpha channel
-    */
 
     ros::spinOnce();
     loop_rate.sleep();
