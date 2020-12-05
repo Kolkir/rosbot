@@ -39,28 +39,30 @@ int main(int argc, char** argv) {
     ROS_ERROR_STREAM("Failed to open camera with index " << camera_index
                                                          << "!");
     ros::shutdown();
+    exit(1);
   }
 
   if (!capture.set(cv::CAP_PROP_FRAME_WIDTH, frame_width)) {
     ROS_ERROR_STREAM("Failed to set frame with " << frame_width);
-  } else {
-    ROS_WARN_STREAM("Frame width configured to "
-                    << capture.get(cv::CAP_PROP_FRAME_WIDTH));
   }
 
   if (!capture.set(cv::CAP_PROP_FRAME_HEIGHT, frame_height)) {
     ROS_ERROR_STREAM("Failed to set frame height " << frame_height);
-  } else {
-    ROS_WARN_STREAM("Frame height configured to "
-                    << capture.get(cv::CAP_PROP_FRAME_HEIGHT));
   }
 
   if (!capture.set(cv::CAP_PROP_FPS, frame_rate)) {
     ROS_ERROR_STREAM("Failed to set frame rate " << frame_rate);
-  } else {
-    ROS_WARN_STREAM("Frame rate configured to "
-                    << capture.get(cv::CAP_PROP_FPS));
   }
+
+  cv::Mat frame;
+  capture >> frame;
+  if (frame.empty()) {
+    ROS_ERROR_STREAM("Failed to capture image!");
+    ros::shutdown();
+    exit(1);
+  }
+
+  ROS_WARN_STREAM("Frame width = " << frame.cols << " height = " << frame.rows);
 
   // Image_transport is responsible for publishing and subscribing to Images
   image_transport::ImageTransport it(node_handler);
@@ -68,7 +70,6 @@ int main(int argc, char** argv) {
   // Publish to the /camera topic
   image_transport::Publisher pub_frame = it.advertise("opencv_camera", 1);
 
-  cv::Mat frame;
   sensor_msgs::ImagePtr msg;
 
   ros::Rate loop_rate(frame_rate);
@@ -77,10 +78,10 @@ int main(int argc, char** argv) {
     // Load image
     capture >> frame;
 
-    // Check if grabbed frame has content
     if (frame.empty()) {
       ROS_ERROR_STREAM("Failed to capture image!");
       ros::shutdown();
+      exit(1);
     }
 
     // Convert image from cv::Mat (OpenCV) type to sensor_msgs/Image (ROS) type
