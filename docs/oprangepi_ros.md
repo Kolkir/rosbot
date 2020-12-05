@@ -38,3 +38,7 @@ catkin_make
 cd src
 git clone https://github.com/Kolkir/rosbot.git
 ~~~
+
+Setup URIs (required step!!!):
+1. `export ROS_MASTER_URI=http://{xxx.xxx.xxx.xxx}:{port}`
+2. `export ROS_HOSTNAME=yyy.yyy.yyy.yyy`
