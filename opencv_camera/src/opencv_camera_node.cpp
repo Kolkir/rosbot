@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
   image_transport::ImageTransport it(node_handler);
 
   // Publish to the /camera topic
-  image_transport::Publisher pub_frame = it.advertise("opencv_camera/raw", 1);
+  image_transport::Publisher pub_frame = it.advertise("opencv_camera", 1);
 
   sensor_msgs::ImagePtr msg;
 
