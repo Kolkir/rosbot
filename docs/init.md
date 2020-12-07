@@ -64,15 +64,9 @@ The `libclang-common-8-dev` is required for qtCreator clang code model to work p
 
 `apt-get install ros-noetic-cv-camera`
 
+`apt-get install ros-noetic-teleop-twist-keyboard`
+
 or use `rosdep install package_name`
 
-### Camera
 
-http://wiki.ros.org/stereo_image_proc/Tutorials/Using%20OpenCV%20for%20Image%20Processing#cv_camera
-
-~~~
-cd /root/workspace/src
-catkin_create_pkg main_camera cv_camera
-
-roslaunch main_camera main_camera.launch main_camera_id:=1
 ~~~
