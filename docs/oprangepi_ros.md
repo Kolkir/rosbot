@@ -20,6 +20,7 @@ sudo apt-get install python3-rosdep
 sudo rosdep init
 rosdep update
 sudo apt-get install ros-noetic-cv-camera
+sudo apt-get install ros-noetic-compressed-image-transport
 ~~~
 
 Setup workspace:
@@ -38,3 +39,7 @@ git clone https://github.com/Kolkir/rosbot.git
 Setup URIs (required step!!!):
 1. `export ROS_MASTER_URI=http://{xxx.xxx.xxx.xxx}:{port}`
 2. `export ROS_HOSTNAME=yyy.yyy.yyy.yyy`
+
+Configure environment:
+1. `source /opt/ros/noetic/setup.sh`
+2. `source /xxxxxx/ros_workspace/devel/setup.sh`
