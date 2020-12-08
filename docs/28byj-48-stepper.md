@@ -50,14 +50,17 @@ Rotating a stepper motor is often called driving and can be a wave drive, full-s
 
 In a wave drive, one electromagnet or coil is excited at a time:
 
+![wave-mode](wave_mode.gif)
 
 In a full-step drive, two coils are excited at a time:
 
+![full-step](full_step_mode.gif)
 
 Since the full-step drive energizes two coils at a time, it requires more current than a wave step. In exchange of the higher current is higher torque.
 
 A half-step combines a wave and a full-step:
 
+![half-step](half_step_mode.gif)
 
 Half-step increases the number of steps per revolution. As you can see in the wave and full-step drives, one revolution takes four steps. In a half-step drive, one revolution takes eight steps. Thus, a half-step drive is recommended for a more precise movements.
 
