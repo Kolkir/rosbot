@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.13)
 project(bot_controller)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -132,7 +132,18 @@ ${catkin_INCLUDE_DIRS}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node src/bot_controller_node.cpp)
+add_executable(${PROJECT_NAME}_node "")
+
+target_sources(${PROJECT_NAME}_node
+  PUBLIC
+  src/bot_controller_node.cpp
+  src/bot_controller.h
+  src/bot_controller.cpp
+  src/hardware_interface.h
+  src/hardware_interface.cpp
+  src/bot_params.h
+  src/bot_params.cpp
+  )
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
