@@ -1,5 +1,7 @@
 # rosbot
 
+<img src="docs/robot1_low.jpg" width="320">
+
 With this project I'm learning ROS and want to create differential wheeled robot. It should consists of:
 
 1. Two 28BYJ-48 Stepper Motors with ULN2003 Drivers
