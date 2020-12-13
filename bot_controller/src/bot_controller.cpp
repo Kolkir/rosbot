@@ -48,3 +48,15 @@ double BotController::ScaleRPM(double rpm) {
     return 0.0;
   return rpm;
 }
+
+std::tuple<double, double> BotController::GetWheelsRevolutions() {
+  if (hardware_interface) {
+    return hardware_interface->GetWheelsRevolutions();
+  } else {
+    return {0, 0};
+  }
+}
+
+const BotParams& BotController::GetParams() const {
+  return params;
+}

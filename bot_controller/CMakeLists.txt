@@ -10,7 +10,8 @@ project(bot_controller)
 find_package(catkin REQUIRED
              roscpp
              sensor_msgs
-             std_msgs)
+             std_msgs
+             tf)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -143,6 +144,8 @@ target_sources(${PROJECT_NAME}_node
   src/hardware_interface.cpp
   src/bot_params.h
   src/bot_params.cpp
+  src/odometry_reporter.h
+  src/odometry_reporter.cpp
   )
 
 ## Rename C++ executable without prefix

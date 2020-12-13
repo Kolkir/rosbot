@@ -19,6 +19,10 @@ class BotController {
 
   void VelocityCallback(const geometry_msgs::Twist& twist_msg);
 
+  std::tuple<double, double> GetWheelsRevolutions();
+
+  const BotParams& GetParams() const;
+
  private:
   void CalculateLeftWheelRPM(double linear_velocity, double angular_velocity);
 
