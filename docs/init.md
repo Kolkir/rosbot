@@ -8,7 +8,7 @@ Start detached container, with mounted workspace directory, spcified name, share
 ~~~
 cd my_workspace_directory
 xhost +local:root
-docker run --device=/dev/video0:/dev/video0 --net=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -dt --name robot_env --restart unless-stopped -v `pwd`:/root/workspace osrf/ros:noetic-desktop-full
+run --device /dev/video0 --device /dev/dri --net=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -dt --name robot_env --restart unless-stopped -v `pwd`:/root/workspace osrf/ros:noetic-desktop-full   
 ~~~
 Connect to the contatiner:
 
