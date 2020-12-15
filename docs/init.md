@@ -67,6 +67,8 @@ The `libclang-common-8-dev` is required for qtCreator clang code model to work p
 
 `apt-get install ros-noetic-teleop-twist-keyboard`
 
+`apt-get install ros-noetic-rosparam-shortcuts`
+
 or use `rosdep install package_name`
 
 
