@@ -9,18 +9,26 @@
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />
 
   <rosparam command="load"
-            file="$(find bot_description)/config/joints.yaml"
-            ns="rosbot_joint_state_controller" />
+            file="$(find bot_description)/config/rosbot_control.yaml"/>
+
+  <!-- Everything works as expected without pid gains for velocity controllers.
+       So we don't load this settings because they break wheels positions
   <rosparam command="load"
-            file="$(find bot_description)/config/diffdrive.yaml"
-            ns="rosbot_diff_drive_controller" />
+            file="$(find bot_description)/config/gazebo_ros_control_params.yaml"/>
+  -->
 
   <node name="rosbot_controller_spawner" pkg="controller_manager" type="spawner"
-    args="rosbot_joint_state_controller
-          rosbot_diff_drive_controller
-          --shutdown-timeout 3"/>
+    args="joint_state_controller
+          mobile_base_controller"
+    ns="rosbot"
+    output="screen"/>
+
+  <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher" ns="rosbot"  output="screen">
+    <param name="publish_frequency" type="double" value="30.0" />
+     <remap from="/joint_states" to="/rosbot/joint_states" />
+  </node>
 
   <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
-    <param name="default_topic" value="/rosbot_diff_drive_controller/cmd_vel"/>
+    <param name="default_topic" value="/rosbot/mobile_base_controller/cmd_vel"/>
   </node>
 </launch>

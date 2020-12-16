@@ -23,21 +23,30 @@
   </material>
 
   <xacro:macro name="cylinder_inertia" params="m r h">
+    <inertial>
+      <mass value="${m}" />
       <inertia  ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0"
                   iyy="${m*(3*r*r+h*h)/12}" iyz = "0"
                   izz="${m*r*r/2}" />
+   </inertial>
   </xacro:macro>
 
   <xacro:macro name="box_inertia" params="m x y z">
-        <inertia  ixx="${m*(y*y+z*z)/12}" ixy = "0" ixz = "0"
+    <inertial>
+      <mass value="${m}" />
+      <inertia  ixx="${m*(y*y+z*z)/12}" ixy = "0" ixz = "0"
                   iyy="${m*(x*x+z*z)/12}" iyz = "0"
                   izz="${m*(x*x+z*z)/12}" />
+    </inertial>
   </xacro:macro>
 
   <xacro:macro name="sphere_inertia" params="m r">
-        <inertia  ixx="${2*m*r*r/5}" ixy = "0" ixz = "0"
+    <inertial>
+      <mass value="${m}" />
+      <inertia  ixx="${2*m*r*r/5}" ixy = "0" ixz = "0"
                   iyy="${2*m*r*r/5}" iyz = "0"
                   izz="${2*m*r*r/5}" />
+    </inertial>
   </xacro:macro>
 
   <link name="base_link">
@@ -72,6 +81,7 @@
       </collision>
       <xacro:cylinder_inertia m="${wheel_mass}" r="${wheel_radius}" h="${wheel_width}"/>
     </link>
+
     <joint name="${prefix}_wheel_joint" type="continuous">
       <axis xyz="0 1 0" rpy="0 0 0" />
       <parent link="base_link"/>
@@ -93,10 +103,10 @@
         <mechanicalReduction>1</mechanicalReduction>
       </actuator>
       <joint name="${prefix}_wheel_joint">
-        <hardwareInterface>VelocityJointInterface</hardwareInterface>
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
       </joint>
     </transmission>
-</xacro:macro>
+  </xacro:macro>
 
   <xacro:wheel prefix="right" reflect="1"/>
   <xacro:wheel prefix="left" reflect="-1"/>
@@ -129,7 +139,7 @@
 
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-      <robotNamespace>/</robotNamespace>
+      <robotNamespace>/rosbot</robotNamespace>
     </plugin>
   </gazebo>
 </robot>
