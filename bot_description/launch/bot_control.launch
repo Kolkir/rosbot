@@ -1,0 +1,21 @@
+<launch>
+        <!-- Load the URDF model of DiffBot into the ROS Parameter Server -->
+    <param name="rosbot/robot_description"
+        command="$(find xacro)/xacro '$(find bot_description)/urdf/bot.urdf.xacro'"/>
+
+    <!-- This will create the bot hardware interface and instantiate a new controller manager with it -->
+    <node name="bot_hw_interface" pkg="bot_hardware_interface" type="bot_hardware_interface_node" ns="rosbot" output="screen"/>
+
+    <!-- Load controller config to the parameter server -->
+    <rosparam command="load"
+              file="$(find bot_description)/config/rosbot_control.yaml"/>
+
+    <!-- Load the controllers -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+        output="screen" ns="rosbot" args="joint_state_controller
+                                          mobile_base_controller"/>
+    <!-- Load robot steering control -->
+    <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
+      <param name="default_topic" value="/rosbot/mobile_base_controller/cmd_vel"/>
+    </node>
+</launch>

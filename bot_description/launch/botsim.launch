@@ -1,5 +1,5 @@
 <launch>
-  <arg name="model" default="$(find bot_description)/urdf/bot.urdf.xarco"/>
+  <arg name="model" default="$(find bot_description)/urdf/bot.urdf.xacro"/>
   <arg name="rvizconfig" default="$(find bot_description)/rviz/bot_description.rviz" />
 
   <include file="$(find bot_description)/launch/gazebo.launch">
