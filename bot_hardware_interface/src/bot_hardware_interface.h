@@ -34,6 +34,7 @@ class BotHardwareInterface : public hardware_interface::RobotHW {
   void LoadURDF(const ros::NodeHandle& nh, std::string param_name);
 
   double LinearToAngular(const double& distance) const;
+  double AngularToLinear(const double& angle) const;
 
   virtual double GetMotorAngle(size_t index) = 0;
 

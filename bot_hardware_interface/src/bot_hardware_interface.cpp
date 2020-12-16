@@ -29,7 +29,7 @@ BotHardwareInterface::BotHardwareInterface(ros::NodeHandle& node_handle)
 
 bool BotHardwareInterface::init(ros::NodeHandle& /*root_nh*/,
                                 ros::NodeHandle& /*robot_hw_nh*/) {
-  ROS_INFO("Initializing DiffBot Hardware Interface ...");
+  ROS_INFO("Initializing rosbot Hardware Interface ...");
 
   num_joints_ = joint_names_.size();
   ROS_INFO("Number of joints: %d", (int)num_joints_);
@@ -37,6 +37,7 @@ bool BotHardwareInterface::init(ros::NodeHandle& /*root_nh*/,
   joint_positions_.resize(num_joints_);
   joint_velocities_.resize(num_joints_);
   joint_efforts_.resize(num_joints_);
+  joint_velocity_commands_.resize(num_joints_);
 
   for (unsigned int i = 0; i < num_joints_; i++) {
     hardware_interface::JointStateHandle joint_state_handle(
@@ -58,7 +59,7 @@ bool BotHardwareInterface::init(ros::NodeHandle& /*root_nh*/,
   registerInterface(&joint_state_interface_);
   registerInterface(&velocity_joint_interface_);
 
-  ROS_INFO("... Done Initializing DiffBot Hardware Interface");
+  ROS_INFO("... Done Initializing rosbot Hardware Interface");
   return true;
 }
 
@@ -119,7 +120,11 @@ void BotHardwareInterface::LoadURDF(const ros::NodeHandle& nh,
 }
 
 double BotHardwareInterface::LinearToAngular(const double& distance) const {
-  return distance / wheel_diameter_ * 2.0;
+  return distance / wheel_radius_;
+}
+
+double BotHardwareInterface::AngularToLinear(const double& angle) const {
+  return angle * wheel_radius_;
 }
 
 LogHWInterface::LogHWInterface(ros::NodeHandle& node_handle)
@@ -134,7 +139,7 @@ void LogHWInterface::SetMotorVelocity(size_t index,
                                       double measured_value,
                                       double setpoint,
                                       const ros::Duration& dt) {
-  ROS_INFO_STREAM("Set motor"
+  ROS_INFO_STREAM("Set motor "
                   << index << " velocity: measured_value = " << measured_value
                   << " setpoint = " << setpoint << " duration = " << dt);
 }
