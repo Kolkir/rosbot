@@ -9,3 +9,4 @@ apt-get install -y git-gui
 apt-get install -y ros-noetic-cv-camera
 apt-get install -y ros-noetic-teleop-twist-keyboard
 apt-get install -y ros-noetic-rosparam-shortcuts
+apt-get install -y ros-noetic-rqt-robot-steering

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="macroed" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="rosbot" xmlns:xacro="http://ros.org/wiki/xacro">
 
   <xacro:property name="base_mass" value="0.9" />
   <xacro:property name="base_length" value="0.145" />
@@ -78,7 +78,25 @@
       <child link="${prefix}_wheel"/>
       <origin xyz="${base_length/3.6} ${base_width/2*reflect + wheel_width/2*reflect} -${base_height/2}" rpy="0 0 0"/>
     </joint>
-  </xacro:macro>
+
+    <gazebo reference="${prefix}_wheel">
+      <mu1 value="200.0"/>
+      <mu2 value="100.0"/>
+      <kp value="10000000.0" />
+      <kd value="1.0" />
+      <material>Gazebo/Black</material>
+    </gazebo>
+
+    <transmission name="${prefix}_wheel_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="${prefix}_wheel_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+      <joint name="${prefix}_wheel_joint">
+        <hardwareInterface>VelocityJointInterface</hardwareInterface>
+      </joint>
+    </transmission>
+</xacro:macro>
 
   <xacro:wheel prefix="right" reflect="1"/>
   <xacro:wheel prefix="left" reflect="-1"/>
@@ -107,5 +125,11 @@
 
   <gazebo reference="rear_wheel">
     <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/</robotNamespace>
+    </plugin>
   </gazebo>
 </robot>
