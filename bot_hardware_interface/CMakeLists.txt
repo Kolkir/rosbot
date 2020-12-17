@@ -144,6 +144,8 @@ target_sources(${PROJECT_NAME}_node
   src/bot_hardware_interface_node.cpp
   src/bot_hardware_interface.h
   src/bot_hardware_interface.cpp
+  src/byj_steppers_hw.h
+  src/byj_steppers_hw.cpp
   )
 
 add_compile_options(-Wall -Wextra)
