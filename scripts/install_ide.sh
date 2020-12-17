@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 apt-get update
 apt-get install -y qtcreator
+apt-get install -y clang-format
 apt-get install -y libclang-common-8-dev
 apt-get install -y vim
 apt-get install -y tmux
