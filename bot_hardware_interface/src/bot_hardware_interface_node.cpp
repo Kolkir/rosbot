@@ -1,14 +1,26 @@
 #include <controller_manager/controller_manager.h>
 #include <ros/ros.h>
+#include <rosparam_shortcuts/rosparam_shortcuts.h>
 #include "bot_hardware_interface.h"
+#include "byj_steppers_hw.h"
 
 int main(int argc, char** argv) {
   // Initialize the ROS node
   ros::init(argc, argv, "bot_hardware_interface");
   ros::NodeHandle node_handle;
 
-  std::unique_ptr<BotHardwareInterface> bot_hw =
-      std::make_unique<LogHWInterface>(node_handle);
+  std::size_t error = 0;
+  std::string hw_backend;
+  error +=
+      !rosparam_shortcuts::get("rosbot", node_handle, "hw_backend", hw_backend);
+  rosparam_shortcuts::shutdownIfError("rosbot", error);
+
+  std::unique_ptr<BotHardwareInterface> bot_hw;
+  if (hw_backend == "byj") {
+    bot_hw = std::make_unique<BYJSteppersHW>(node_handle);
+  } else {
+    bot_hw = std::make_unique<LogHWInterface>(node_handle);
+  }
   assert(bot_hw);
 
   controller_manager::ControllerManager cm(bot_hw.get());
