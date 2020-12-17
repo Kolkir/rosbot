@@ -9,9 +9,8 @@ int main(int argc, char** argv) {
   ros::init(argc, argv, "bot_hardware_interface");
   ros::NodeHandle node_handle;
 
-  std::size_t error = 0;
   std::string hw_backend;
-  error +=
+  std::size_t error =
       !rosparam_shortcuts::get("rosbot", node_handle, "hw_backend", hw_backend);
   rosparam_shortcuts::shutdownIfError("rosbot", error);
 
@@ -25,10 +24,12 @@ int main(int argc, char** argv) {
 
   controller_manager::ControllerManager cm(bot_hw.get());
 
+  const int num_threads = 3;  // 1 - for general callbacks, 2 - for wheel timers
+
   // Setup a separate thread that will be used to service ROS callbacks.
   // NOTE: We run the ROS loop in a separate thread as external calls such
   // as service callbacks to load controllers can block the (main) control loop
-  ros::AsyncSpinner spinner(1);
+  ros::AsyncSpinner spinner(num_threads);
   spinner.start();
 
   ros::Time prev_time = ros::Time::now();

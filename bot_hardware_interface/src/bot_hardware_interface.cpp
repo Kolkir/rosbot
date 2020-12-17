@@ -10,18 +10,16 @@ BotHardwareInterface::BotHardwareInterface(ros::NodeHandle& node_handle)
   ros::NodeHandle rpnh(node_handle_, name_);
   std::size_t error = 0;
   error += !rosparam_shortcuts::get(name_, rpnh, "joints", joint_names_);
+
   error += !rosparam_shortcuts::get(name_, node_handle_,
                                     "mobile_base_controller/wheel_radius",
                                     wheel_radius_);
-  error += !rosparam_shortcuts::get(
-      name_, node_handle_, "mobile_base_controller/linear/x/max_velocity",
-      max_velocity_);
-  rosparam_shortcuts::shutdownIfError(name_, error);
 
-  wheel_diameter_ = 2.0 * wheel_radius_;
-  // ros_control RobotHW needs velocity in rad/s but in the config its given in
-  // m/s
-  max_velocity_ = LinearToAngular(max_velocity_);
+  error += !rosparam_shortcuts::get(name_, node_handle_,
+                                    "mobile_base_controller/wheel_separation",
+                                    wheels_base_);
+
+  rosparam_shortcuts::shutdownIfError(name_, error);
 
   // Initialize the hardware interface
   init(node_handle_, node_handle_);
@@ -90,12 +88,12 @@ void BotHardwareInterface::write(const ros::Time& /*time*/,
   }
 }
 
-double BotHardwareInterface::GetWheelRadius() const {
-  return wheel_radius_;
+double BotHardwareInterface::GetWheelsBase() const {
+  return wheels_base_;
 }
 
-double BotHardwareInterface::GetMaxVelocity() const {
-  return max_velocity_;
+double BotHardwareInterface::GetWheelRadius() const {
+  return wheel_radius_;
 }
 
 void BotHardwareInterface::LoadURDF(const ros::NodeHandle& nh,

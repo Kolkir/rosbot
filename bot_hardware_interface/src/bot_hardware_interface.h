@@ -30,15 +30,16 @@ class BotHardwareInterface : public hardware_interface::RobotHW {
    */
   void write(const ros::Time& time, const ros::Duration& period) override;
 
+  double GetWheelsBase() const;
+
   double GetWheelRadius() const;
 
-  double GetMaxVelocity() const;
+  double LinearToAngular(const double& distance) const;
+
+  double AngularToLinear(const double& angle) const;
 
  private:
   void LoadURDF(const ros::NodeHandle& nh, std::string param_name);
-
-  double LinearToAngular(const double& distance) const;
-  double AngularToLinear(const double& angle) const;
 
   virtual double GetMotorAngle(size_t index) = 0;
 
@@ -66,9 +67,8 @@ class BotHardwareInterface : public hardware_interface::RobotHW {
   std::size_t num_joints_ = 0;
   std::unique_ptr<urdf::Model> urdf_model_;
 
+  double wheels_base_ = 0;
   double wheel_radius_ = 0.;
-  double wheel_diameter_ = 0.;
-  double max_velocity_ = 0.;
 
   // Data member array to store the controller commands which are sent to the
   // robot's resources (joints, actuators)
@@ -97,8 +97,6 @@ class LogHWInterface : public BotHardwareInterface {
                         double measured_value,
                         double setpoint,
                         const ros::Duration& dt) override;
-
- private:
 };
 
 #endif  // BOTHARDWAREINTERFACE_H
