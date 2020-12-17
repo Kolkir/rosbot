@@ -90,6 +90,14 @@ void BotHardwareInterface::write(const ros::Time& /*time*/,
   }
 }
 
+double BotHardwareInterface::GetWheelRadius() const {
+  return wheel_radius_;
+}
+
+double BotHardwareInterface::GetMaxVelocity() const {
+  return max_velocity_;
+}
+
 void BotHardwareInterface::LoadURDF(const ros::NodeHandle& nh,
                                     std::string param_name) {
   std::string urdf_string;

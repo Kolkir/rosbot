@@ -30,6 +30,10 @@ class BotHardwareInterface : public hardware_interface::RobotHW {
    */
   void write(const ros::Time& time, const ros::Duration& period) override;
 
+  double GetWheelRadius() const;
+
+  double GetMaxVelocity() const;
+
  private:
   void LoadURDF(const ros::NodeHandle& nh, std::string param_name);
 
