@@ -1,8 +1,15 @@
 <launch>
+    <!-- Start HW main_camera -->
+    <include file="$(find main_camera)/launch/main_camera.launch" />
+
     <!-- Configure HW backend implementation -->
     <param name="rosbot/hw_backend" type="string" value="byj" />
-    <param name="rosbot/left_motor_pins"  value="[3, 5, 7, 16]" />
-    <param name="rosbot/right_motor_pins" value="[15, 19, 21, 23]" />
+    <rosparam param="rosbot/left_motor_pins">
+      [3.0, 5.0, 7.0, 16.0]
+    </rosparam>
+    <rosparam param="rosbot/right_motor_pins">
+      [15.0, 19.0, 21.0, 23.0]
+    </rosparam>
 
     <!-- Load the URDF model of DiffBot into the ROS Parameter Server -->
     <param name="rosbot/robot_description"
@@ -19,8 +26,9 @@
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
         output="screen" ns="rosbot" args="joint_state_controller
                                           mobile_base_controller"/>
-    <!-- Load robot steering control -->
+    <!-- Load robot steering control
     <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
       <param name="default_topic" value="/rosbot/mobile_base_controller/cmd_vel"/>
     </node>
+    -->
 </launch>
