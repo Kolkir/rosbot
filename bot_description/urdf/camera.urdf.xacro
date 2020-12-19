@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+<xacro:property name="M_PI" value="3.141592" />
+<link name="top_camera">
+  <xacro:box_inertia m="0.01" x="0.01" y="0.07" z="0.04"/>
+  <visual>
+    <geometry>
+      <box size="0.01 0.07 0.04" />
+    </geometry>
+    <material name="white"/>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <box size="0.01 0.07 0.04" />
+    </geometry>
+  </collision>
+</link>
+
+<joint name="top_camera_joint" type="fixed">
+  <origin xyz="0.0  0.0 ${base_height/2 + 0.02}" rpy="0 0 0" />
+  <parent link="base_link" />
+  <child link="top_camera"/>
+</joint>
+
+<gazebo reference="top_camera">
+ <sensor type="camera" name="main_camera">
+   <update_rate>30.0</update_rate>
+   <camera name="head">
+     <horizontal_fov>1.3962634</horizontal_fov>
+     <image>
+       <width>800</width>
+       <height>600</height>
+       <format>R8G8B8</format>
+     </image>
+     <clip>
+       <near>0.02</near>
+       <far>300</far>
+     </clip>
+     <noise>
+       <type>gaussian</type>
+       <mean>0.0</mean>
+       <stddev>0.007</stddev>
+     </noise>
+   </camera>
+   <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+     <alwaysOn>true</alwaysOn>
+     <updateRate>0.0</updateRate>
+     <cameraName>rosrbot/main_camera</cameraName>
+     <imageTopicName>main_camera/image_raw</imageTopicName>
+     <cameraInfoTopicName>main_camera/camera_info</cameraInfoTopicName>
+     <frameName>camera_link_optical</frameName>
+     <hackBaseline>0.0</hackBaseline>
+     <distortionK1>0.0</distortionK1>
+     <distortionK2>0.0</distortionK2>
+     <distortionK3>0.0</distortionK3>
+     <distortionT1>0.0</distortionT1>
+     <distortionT2>0.0</distortionT2>
+     <CxPrime>0</CxPrime>
+     <Cx>0.0</Cx>
+     <Cy>0.0</Cy>
+     <focalLength>0.0</focalLength>
+   </plugin>
+ </sensor>
+</gazebo>
+
+<link name="camera_optical_frame">
+  <inertial>
+    <mass value="0.01" />
+    <origin xyz="0 0 0" />
+    <inertia ixx="0.001"  ixy="0.0"  ixz="0.0"
+             iyy="0.001"  iyz="0.0"
+             izz="0.001" />
+  </inertial>
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <box size="0.001 0.001 0.001" />
+    </geometry>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <box size="0.001 0.001 0.001" />
+    </geometry>
+  </collision>
+</link>
+
+<joint name="camera_optical_joint" type="fixed">
+  <origin xyz="0 0 0" rpy="${-M_PI/2} 0.0 ${-M_PI/2}" />
+  <parent link="top_camera" />
+  <child link="camera_optical_frame"/>
+</joint>
+
+</robot>
