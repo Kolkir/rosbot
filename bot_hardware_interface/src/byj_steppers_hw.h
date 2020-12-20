@@ -3,12 +3,15 @@
 
 #include <atomic>
 #include "bot_hardware_interface.h"
+#include "gpio_base.h"
 
 // Differential drive Implementation with 28BYJ-48 stepper motors
 
 class BYJStepper {
  public:
-  BYJStepper(ros::NodeHandle& node_handle, std::vector<size_t> pins);
+  BYJStepper(ros::NodeHandle& node_handle,
+             std::shared_ptr<GPIOBase> gpio,
+             std::vector<size_t> pins);
   BYJStepper(const BYJStepper&) = delete;
   BYJStepper& operator=(const BYJStepper&) = delete;
 
@@ -20,6 +23,7 @@ class BYJStepper {
   void HWUpdate(const ros::TimerEvent& event);
 
  private:
+  std::shared_ptr<GPIOBase> gpio_;
   ros::Timer timer_;
   ros::Duration timeout_{1.0};  // seconds
   size_t halfstep_ = 0;
@@ -43,6 +47,7 @@ class BYJSteppersHW : public BotHardwareInterface {
   void SetLinearVelocity(size_t index, double value);
 
  private:
+  std::shared_ptr<GPIOBase> gpio_;
   std::unique_ptr<BYJStepper> left_motor_;
   std::unique_ptr<BYJStepper> right_motor_;
 

@@ -122,6 +122,11 @@ catkin_package(
 include_directories(
 # include
 ${catkin_INCLUDE_DIRS}
+third_party/build/include
+)
+
+link_directories(
+third_party/build/lib
 )
 
 ## Declare a C++ library
@@ -134,10 +139,17 @@ ${catkin_INCLUDE_DIRS}
 ## either from message generation or dynamic reconfigure
 # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+add_custom_target(
+    GpioTarget
+    COMMAND make install WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/third_party/wiringop-zero
+)
+
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node "")
+
+add_dependencies(${PROJECT_NAME}_node GpioTarget)
 
 target_sources(${PROJECT_NAME}_node
   PUBLIC
@@ -146,6 +158,10 @@ target_sources(${PROJECT_NAME}_node
   src/bot_hardware_interface.cpp
   src/byj_steppers_hw.h
   src/byj_steppers_hw.cpp
+  src/gpio_base.h
+  src/gpio_base.cpp
+  src/gpio_opi.h
+  src/gpio_opi.cpp
   )
 
 add_compile_options(-Wall -Wextra)
@@ -163,6 +179,13 @@ add_compile_options(-Wall -Wextra)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
+  wiringPi
+  pthread
+)
+
+add_custom_command(TARGET ${PROJECT_NAME}_node POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/third_party/build/lib/libwiringPi.so.2.0
+                                     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${PROJECT_NAME}/
 )
 
 #############

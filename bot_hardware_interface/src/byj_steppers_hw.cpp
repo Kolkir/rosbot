@@ -1,5 +1,6 @@
 #include "byj_steppers_hw.h"
 #include <rosparam_shortcuts/rosparam_shortcuts.h>
+#include "gpio_opi.h"
 
 static std::vector<std::vector<size_t>> halfstep_seq = {
     {1, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 1, 0},
@@ -25,8 +26,11 @@ BYJSteppersHW::BYJSteppersHW(ros::NodeHandle& node_handle)
   std::vector<size_t> right_control_pins(left_pins.begin(), left_pins.end());
   std::vector<size_t> left_control_pins(right_pins.begin(), right_pins.end());
 
-  left_motor_ = std::make_unique<BYJStepper>(node_handle, left_control_pins);
-  right_motor_ = std::make_unique<BYJStepper>(node_handle, right_control_pins);
+  gpio_ = std::make_shared<GPIO_OPI>();
+  left_motor_ =
+      std::make_unique<BYJStepper>(node_handle, gpio_, left_control_pins);
+  right_motor_ =
+      std::make_unique<BYJStepper>(node_handle, gpio_, right_control_pins);
 }
 
 double BYJSteppersHW::GetMotorAngle(size_t index) {
@@ -79,13 +83,16 @@ void BYJSteppersHW::SetLinearVelocity(size_t index, double value) {
   }
 }
 
-BYJStepper::BYJStepper(ros::NodeHandle& node_handle, std::vector<size_t> pins)
-    : ticks_(0), pins_(pins) {
+BYJStepper::BYJStepper(ros::NodeHandle& node_handle,
+                       std::shared_ptr<GPIOBase> gpio,
+                       std::vector<size_t> pins)
+    : gpio_(gpio), ticks_(0), pins_(pins) {
   if (pins_.size() != 4) {
     ROS_ERROR_STREAM("Incorrect number of pins for a motor");
     ros::shutdown();
     exit(1);
   }
+  gpio_->ConfigureOutputPints(pins_);
   timer_ =
       node_handle.createTimer(ros::Duration(timeout_), &BYJStepper::HWUpdate,
                               this, /*oneshot*/ false, /*autostart*/ false);
@@ -103,7 +110,7 @@ void BYJStepper::SetTimeout(ros::Duration timeout) {
 }
 
 void BYJStepper::HWUpdate(const ros::TimerEvent& /*event*/) {
-  // GPIO.output(pins_, halfstep_seq[step_]);
+  gpio_->Output(pins_, halfstep_seq[halfstep_]);
 
   halfstep_ += 1;
   if (halfstep_ >= halfstep_seq.size()) {
