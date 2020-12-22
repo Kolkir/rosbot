@@ -18,19 +18,26 @@ GPIO_OPI::~GPIO_OPI() {}
 void GPIO_OPI::Output(const std::vector<size_t>& pins,
                       const std::vector<size_t>& values) {
   assert(pins.size() == values.size());
+  if (pins_.empty()) {
+    return;
+  } 
   size_t len = pins.size();
   for (size_t i = 0; i < len; ++i) {
-    auto pin_num = pins[i];
-    auto ret = gpiod_line_set_value(pins_.at(pin_num).get(), values[i]);
-    if (ret < 0) {
-      ROS_ERROR_STREAM("Set line output failed\n");
+    try {
+      auto pin_num = pins[i];
+      auto ret = gpiod_line_set_value(pins_.at(pin_num).get(), values[i]);
+      if (ret < 0) {
+        ROS_ERROR_STREAM("Set pin" << pin_num << " output failed\n");
+        ros::shutdown();
+      }
+    } catch(const std::exception& err) {
+      ROS_ERROR_STREAM("Output pin " << pins[i] << " " << err.what());
       ros::shutdown();
     }
   }
 }
 
 void GPIO_OPI::ConfigureOutputPints(const std::vector<size_t>& pins) {
-  pins_.clear();
   for (auto pin_num : pins) {
     auto* pin = gpiod_chip_get_line(chip_.get(), pin_num);
     if (!pin) {
@@ -43,6 +50,11 @@ void GPIO_OPI::ConfigureOutputPints(const std::vector<size_t>& pins) {
     auto ret = gpiod_line_request_output(pin, "Consumer", 0);
     if (ret < 0) {
       ROS_ERROR_STREAM("Request GPIO pin " << pin_num << " as output failed\n");
+      ros::shutdown();
+    }
+    ret = gpiod_line_set_value(pin, 0);
+    if (ret < 0) {
+      ROS_ERROR_STREAM("Set line output failed " << pin_num);
       ros::shutdown();
     }
   }

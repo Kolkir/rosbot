@@ -23,8 +23,8 @@ BYJSteppersHW::BYJSteppersHW(ros::NodeHandle& node_handle)
                                     right_pins);
   rosparam_shortcuts::shutdownIfError("rosbot", error);
 
-  std::vector<size_t> right_control_pins(left_pins.begin(), left_pins.end());
-  std::vector<size_t> left_control_pins(right_pins.begin(), right_pins.end());
+  std::vector<size_t> left_control_pins(left_pins.begin(), left_pins.end());
+  std::vector<size_t> right_control_pins(right_pins.begin(), right_pins.end());
 
   gpio_ = std::make_shared<GPIO_OPI>();
   // gpio_ = std::make_shared<GPIO_Log>();

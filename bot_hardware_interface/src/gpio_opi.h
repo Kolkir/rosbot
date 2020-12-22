@@ -22,7 +22,7 @@ class GPIO_OPI : public GPIOBase {
   void ConfigureOutputPints(const std::vector<size_t>& pins) override;
 
  private:
-  std::string gpio_chip_name_ = "gpiochip0";
+  std::string gpio_chip_name_ = "gpiochip1";
   using ChipPtr = std::unique_ptr<gpiod_chip, void (*)(gpiod_chip*)>;
   ChipPtr chip_;
   using PinPtr = std::unique_ptr<gpiod_line, void (*)(gpiod_line*)>;

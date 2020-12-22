@@ -8,7 +8,7 @@
       [3.0, 5.0, 7.0, 16.0]
     </rosparam>
     <rosparam param="rosbot/right_motor_pins">
-      [15.0, 19.0, 21.0, 23.0]
+      [15.0, 19.0, 21.0, 18.0]
     </rosparam>
 
     <!-- Load the URDF model of DiffBot into the ROS Parameter Server -->
