@@ -9,6 +9,8 @@
 
 class BYJStepper {
  public:
+  enum Direction { CW, CCW };
+
   BYJStepper(ros::NodeHandle& node_handle,
              std::shared_ptr<GPIOBase> gpio,
              std::vector<size_t> pins);
@@ -16,6 +18,8 @@ class BYJStepper {
   BYJStepper& operator=(const BYJStepper&) = delete;
 
   void SetTimeout(ros::Duration timeout);
+
+  void SetDirection(Direction dir);
 
   double GetAngle();
 
@@ -29,6 +33,7 @@ class BYJStepper {
   size_t halfstep_ = 0;
   std::atomic<size_t> ticks_;
   std::vector<size_t> pins_;
+  Direction direction_ = CW;
 };
 
 class BYJSteppersHW : public BotHardwareInterface {
