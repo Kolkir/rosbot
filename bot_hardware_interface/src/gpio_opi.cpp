@@ -52,10 +52,15 @@ void GPIO_OPI::ConfigureOutputPints(const std::vector<size_t>& pins) {
       ROS_ERROR_STREAM("Request GPIO pin " << pin_num << " as output failed\n");
       ros::shutdown();
     }
+    sleep(1);
+    ret = gpiod_line_set_value(pin, 1);
+    sleep(1);
     ret = gpiod_line_set_value(pin, 0);
+    sleep(1);
     if (ret < 0) {
       ROS_ERROR_STREAM("Set line output failed " << pin_num);
       ros::shutdown();
     }
+    ROS_INFO_STREAM("Pin set " << pin_num);
   }
 }

@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <mutex>
 #include "gpio_base.h"
 
 struct gpiod_chip;
@@ -27,6 +28,7 @@ class GPIO_OPI : public GPIOBase {
   ChipPtr chip_;
   using PinPtr = std::unique_ptr<gpiod_line, void (*)(gpiod_line*)>;
   std::unordered_map<size_t, PinPtr> pins_;
+  std::mutex guard_;
 };
 
 #endif  // GPIO_OPI_H

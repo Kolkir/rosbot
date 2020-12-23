@@ -138,8 +138,9 @@ void BYJStepper::HWUpdate(const ros::TimerEvent& /*event*/) {
   } else {
     if (halfstep_ == 0) {
       halfstep_ = halfstep_seq.size() - 1;
+    } else {
+      halfstep_ -= 1;
     }
-    halfstep_ -= 1;
   }
 
   ticks_ += 1;
