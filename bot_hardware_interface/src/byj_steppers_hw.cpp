@@ -28,10 +28,10 @@ BYJSteppersHW::BYJSteppersHW(ros::NodeHandle& node_handle)
 
   gpio_ = std::make_shared<GPIO_OPI>();
   // gpio_ = std::make_shared<GPIO_Log>();
-  left_motor_ = std::make_unique<BYJStepper>(node_handle, gpio_,
-                                             left_control_pins, BYJStepper::CW);
+  left_motor_ = std::make_unique<BYJStepper>(
+      node_handle, gpio_, left_control_pins, BYJStepper::CCW);
   right_motor_ = std::make_unique<BYJStepper>(
-      node_handle, gpio_, right_control_pins, BYJStepper::CCW);
+      node_handle, gpio_, right_control_pins, BYJStepper::CW);
 }
 
 double BYJSteppersHW::GetMotorAngle(size_t index) {
