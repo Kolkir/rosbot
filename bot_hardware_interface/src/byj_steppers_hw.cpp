@@ -28,10 +28,10 @@ BYJSteppersHW::BYJSteppersHW(ros::NodeHandle& node_handle)
 
   gpio_ = std::make_shared<GPIO_OPI>();
   // gpio_ = std::make_shared<GPIO_Log>();
-  left_motor_ =
-      std::make_unique<BYJStepper>(node_handle, gpio_, left_control_pins);
-  right_motor_ =
-      std::make_unique<BYJStepper>(node_handle, gpio_, right_control_pins);
+  left_motor_ = std::make_unique<BYJStepper>(node_handle, gpio_,
+                                             left_control_pins, BYJStepper::CW);
+  right_motor_ = std::make_unique<BYJStepper>(
+      node_handle, gpio_, right_control_pins, BYJStepper::CCW);
 }
 
 double BYJSteppersHW::GetMotorAngle(size_t index) {
@@ -56,7 +56,7 @@ double BYJSteppersHW::GetMotorAngle(size_t index) {
 void BYJSteppersHW::SetMotorVelocity(size_t index,
                                      double /*measured_value*/,
                                      double setpoint,
-                                     const ros::Duration& dt) {
+                                     const ros::Duration& /*dt*/) {
   // joint velocity commands from ros_control's RobotHW are in rad/s
   auto linear_velocity = AngularToLinear(setpoint);  // meter/s
 
@@ -68,24 +68,21 @@ void BYJSteppersHW::SetMotorVelocity(size_t index,
 
 void BYJSteppersHW::SetLinearVelocity(size_t index, double value) {
   auto rpm = fabs(value / rpm_multiplier_) * 60.0;
-  auto seconds_timeout = ros::Duration();
-  if (rpm > 0) {
-    seconds_timeout = ros::Duration(60.0 / (rpm * steps_per_rotation_));
-  }
+
   //  ROS_INFO_STREAM("Linear velocity index = "
   //                  << index << " value = " << value << " rpm = " << rpm
   //                  << " timeout = " << seconds_timeout.toSec());
 
   switch (index) {
     case 0:
-      left_motor_->SetDirection(value < 0.0 ? BYJStepper::Direction::CCW
-                                            : BYJStepper::Direction::CW);
-      left_motor_->SetTimeout(seconds_timeout);
+      value >= 0.0 ? left_motor_->SetOriginalDirection()
+                   : left_motor_->SetOpositeDirection();
+      left_motor_->SetRPM(rpm);
       break;
     case 1:
-      right_motor_->SetDirection(value < 0.0 ? BYJStepper::Direction::CCW
-                                             : BYJStepper::Direction::CW);
-      right_motor_->SetTimeout(seconds_timeout);
+      value >= 0.0 ? right_motor_->SetOriginalDirection()
+                   : right_motor_->SetOpositeDirection();
+      right_motor_->SetRPM(rpm);
       break;
     default:
       ROS_ERROR_STREAM(
@@ -99,8 +96,9 @@ void BYJSteppersHW::SetLinearVelocity(size_t index, double value) {
 
 BYJStepper::BYJStepper(ros::NodeHandle& node_handle,
                        std::shared_ptr<GPIOBase> gpio,
-                       std::vector<size_t> pins)
-    : gpio_(gpio), ticks_(0), pins_(pins) {
+                       std::vector<size_t> pins,
+                       Direction dir)
+    : gpio_(gpio), ticks_(0), pins_(pins), original_direction_(dir) {
   if (pins_.size() != 4) {
     ROS_ERROR_STREAM("Incorrect number of pins for a motor");
     ros::shutdown();
@@ -112,19 +110,28 @@ BYJStepper::BYJStepper(ros::NodeHandle& node_handle,
                               this, /*oneshot*/ false, /*autostart*/ false);
 }
 
-void BYJStepper::SetTimeout(ros::Duration timeout) {
-  timeout_ = timeout;
+void BYJStepper::SetRPM(double rpm) {
+  auto seconds_timeout = ros::Duration();
+  if (rpm > 0) {
+    seconds_timeout = ros::Duration(60.0 / (rpm * steps_per_rotation_));
+  }
+  timeout_ = seconds_timeout;
   const double one_millisec = 0.001;
-  if (timeout.toSec() < one_millisec) {
+  if (timeout_.toSec() < one_millisec) {
     timer_.stop();
+    gpio_->Output(pins_, {0, 0, 0, 0});
   } else {
     timer_.setPeriod(timeout_);
     timer_.start();
   }
 }
 
-void BYJStepper::SetDirection(BYJStepper::Direction dir) {
-  direction_ = dir;
+void BYJStepper::SetOriginalDirection() {
+  direction_ = original_direction_;
+}
+
+void BYJStepper::SetOpositeDirection() {
+  direction_ = GetOpositeDirection(original_direction_);
 }
 
 void BYJStepper::HWUpdate(const ros::TimerEvent& /*event*/) {
@@ -149,7 +156,21 @@ void BYJStepper::HWUpdate(const ros::TimerEvent& /*event*/) {
   }
 }
 
-double BYJStepper::GetAngle() {
+BYJStepper::Direction BYJStepper::GetOpositeDirection(
+    BYJStepper::Direction dir) {
+  switch (dir) {
+    case CW:
+      return CCW;
+    case CCW:
+      return CW;
+    default:
+      ROS_ERROR_STREAM("Incorrect motor direction " << dir);
+      ros::shutdown();
+  }
+  return CW;
+}
+
+double BYJStepper::GetAngle() const {
   auto ticks = ticks_.load();
   auto angle = ticks * angle_per_tick;
 

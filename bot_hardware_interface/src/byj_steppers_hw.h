@@ -13,18 +13,23 @@ class BYJStepper {
 
   BYJStepper(ros::NodeHandle& node_handle,
              std::shared_ptr<GPIOBase> gpio,
-             std::vector<size_t> pins);
+             std::vector<size_t> pins,
+             Direction dir);
   BYJStepper(const BYJStepper&) = delete;
   BYJStepper& operator=(const BYJStepper&) = delete;
 
-  void SetTimeout(ros::Duration timeout);
+  void SetRPM(double rpm);
 
-  void SetDirection(Direction dir);
+  void SetOriginalDirection();
 
-  double GetAngle();
+  void SetOpositeDirection();
+
+  double GetAngle() const;
 
  private:
   void HWUpdate(const ros::TimerEvent& event);
+
+  static Direction GetOpositeDirection(Direction dir);
 
  private:
   std::shared_ptr<GPIOBase> gpio_;
@@ -34,6 +39,8 @@ class BYJStepper {
   std::atomic<size_t> ticks_;
   std::vector<size_t> pins_;
   Direction direction_ = CW;
+  Direction original_direction_ = CW;
+  double const steps_per_rotation_ = 4076;  // in the half-step mode
 };
 
 class BYJSteppersHW : public BotHardwareInterface {
@@ -57,8 +64,6 @@ class BYJSteppersHW : public BotHardwareInterface {
   std::unique_ptr<BYJStepper> right_motor_;
 
   double rpm_multiplier_ = 0.0;  // the length of a wheel used to calculate RPM
-
-  double const steps_per_rotation_ = 4076;  // in the half-step mode
 };
 
 #endif  // BYJSTEPPERSHW_H
