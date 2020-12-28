@@ -69,9 +69,8 @@ void BYJSteppersHW::SetMotorVelocity(size_t index,
 void BYJSteppersHW::SetLinearVelocity(size_t index, double value) {
   auto rpm = fabs(value / rpm_multiplier_) * 60.0;
 
-  //  ROS_INFO_STREAM("Linear velocity index = "
-  //                  << index << " value = " << value << " rpm = " << rpm
-  //                  << " timeout = " << seconds_timeout.toSec());
+  // ROS_INFO_STREAM("Linear velocity index = "
+  //                 << index << " value = " << value << " rpm = " << rpm);
 
   switch (index) {
     case 0:
@@ -105,15 +104,15 @@ BYJStepper::BYJStepper(ros::NodeHandle& node_handle,
     exit(1);
   }
   gpio_->ConfigureOutputPints(pins_);
-  timer_ = node_handle.createWallTimer(ros::Duration(timeout_),
+  timer_ = node_handle.createWallTimer(timeout_,
                                        &BYJStepper::HWUpdate, this,
                                        /*oneshot*/ false, /*autostart*/ false);
 }
 
 void BYJStepper::SetRPM(double rpm) {
-  auto seconds_timeout = ros::Duration();
+  auto seconds_timeout = ros::WallDuration();
   if (rpm > 0) {
-    seconds_timeout = ros::Duration(60.0 / (rpm * steps_per_rotation_));
+    seconds_timeout = ros::WallDuration(60.0 / (rpm * steps_per_rotation_));
   }
   timeout_ = seconds_timeout;
   const double one_millisec = 0.001;

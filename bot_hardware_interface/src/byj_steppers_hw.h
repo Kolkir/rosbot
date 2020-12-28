@@ -34,7 +34,7 @@ class BYJStepper {
  private:
   std::shared_ptr<GPIOBase> gpio_;
   ros::WallTimer timer_;
-  ros::Duration timeout_{1.0};  // seconds
+  ros::WallDuration timeout_{1.0};  // seconds
   size_t halfstep_ = 0;
   std::atomic<size_t> ticks_;
   std::vector<size_t> pins_;
