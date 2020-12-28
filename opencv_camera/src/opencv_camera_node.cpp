@@ -1,7 +1,9 @@
+#include <camera_info_manager/camera_info_manager.h>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <ros/ros.h>
 #include <sensor_msgs/image_encodings.h>
+#include <boost/assign/list_of.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
 struct CameraParams {
@@ -45,6 +47,30 @@ CameraParams ReadCameraParams(ros::NodeHandle& node_handler) {
   return params;
 }
 
+sensor_msgs::CameraInfo MakeDefaultCameraInfo(sensor_msgs::ImagePtr img) {
+  sensor_msgs::CameraInfo cam_info_msg;
+  cam_info_msg.header.frame_id = img->header.frame_id;
+  // Fill image size
+  cam_info_msg.height = img->height;
+  cam_info_msg.width = img->width;
+  // Add the most common distortion model as sensor_msgs/CameraInfo says
+  cam_info_msg.distortion_model = "plumb_bob";
+  // Don't let distorsion matrix be empty
+  cam_info_msg.D.resize(5, 0.0);
+  // Give a reasonable default intrinsic camera matrix
+  cam_info_msg.K =
+      boost::assign::list_of(img->width / 2.0)(0.0)(img->width / 2.0)(0.0)(
+          img->height / 2.0)(img->height / 2.0)(0.0)(0.0)(1.0);
+  // Give a reasonable default rectification matrix
+  cam_info_msg.R =
+      boost::assign::list_of(1.0)(0.0)(0.0)(0.0)(1.0)(0.0)(0.0)(0.0)(1.0);
+  // Give a reasonable default projection matrix
+  cam_info_msg.P =
+      boost::assign::list_of(img->width / 2.0)(0.0)(img->width / 2.0)(0.0)(0.0)(
+          img->height / 2.0)(img->height / 2.0)(0.0)(0.0)(0.0)(1.0)(0.0);
+  return cam_info_msg;
+}
+
 int main(int argc, char** argv) {
   ros::init(argc, argv, "opencv_camera");
   ros::NodeHandle node_handler;
@@ -81,11 +107,21 @@ int main(int argc, char** argv) {
 
   ROS_WARN_STREAM("Frame width = " << frame.cols << " height = " << frame.rows);
 
+  const std::string camera_name = "opencv_camera";
+  std::string camera_info_url;
+
+  // CameraInfoManager is responsible for SetCameraInfo service requests, saves
+  // and restores sensor_msgs/CameraInfo data.
+  camera_info_manager::CameraInfoManager cam_info_manager(
+      node_handler, camera_name, camera_info_url);
+  sensor_msgs::CameraInfo cam_info_msg = cam_info_manager.getCameraInfo();
+
   // Image_transport is responsible for publishing and subscribing to Images
   image_transport::ImageTransport it(node_handler);
 
   // Publish to the /camera topic
-  image_transport::Publisher pub_frame = it.advertise("opencv_camera", 1);
+  image_transport::CameraPublisher pub_frame =
+      it.advertiseCamera("image_raw", 1);
 
   sensor_msgs::ImagePtr msg;
 
@@ -101,7 +137,17 @@ int main(int argc, char** argv) {
     }
 
     msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
-    pub_frame.publish(msg);
+
+    // Create a default camera info if we didn't get a stored one on
+    // initialization
+    if (cam_info_msg.distortion_model == "") {
+      ROS_WARN_STREAM(
+          "No calibration file given, publishing a reasonable default camera "
+          "info.");
+      cam_info_msg = MakeDefaultCameraInfo(msg);
+    }
+    // The timestamps are in sync thanks to this publisher
+    pub_frame.publish(*msg, cam_info_msg, ros::Time::now());
 
     ros::spinOnce();
     loop_rate.sleep();

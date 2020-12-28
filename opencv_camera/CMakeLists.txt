@@ -10,6 +10,7 @@ project(opencv_camera)
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
+  camera_info_manager
   roscpp
   sensor_msgs
   std_msgs
