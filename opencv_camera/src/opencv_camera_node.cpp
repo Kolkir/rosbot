@@ -121,11 +121,11 @@ int main(int argc, char** argv) {
 
   // Publish to the /camera topic
   image_transport::CameraPublisher pub_frame =
-      it.advertiseCamera("image_raw", 1);
+      it.advertiseCamera("/opencv_camera/image_raw", 1);
 
   sensor_msgs::ImagePtr msg;
 
-  ros::Rate loop_rate(params.frame_rate);
+  ros::WallRate loop_rate(ros::Duration(1.0 / params.frame_rate));
 
   while (node_handler.ok()) {
     capture >> frame;
@@ -146,8 +146,7 @@ int main(int argc, char** argv) {
           "info.");
       cam_info_msg = MakeDefaultCameraInfo(msg);
     }
-    // The timestamps are in sync thanks to this publisher
-    pub_frame.publish(*msg, cam_info_msg, ros::Time::now());
+    pub_frame.publish(*msg, cam_info_msg);
 
     ros::spinOnce();
     loop_rate.sleep();

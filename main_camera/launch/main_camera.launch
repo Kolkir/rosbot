@@ -2,12 +2,13 @@
     <param name="/opencv_camera/camera_index" type="int" value="0" />
     <param name="/opencv_camera/frame_width" type="double" value="1920" />
     <param name="/opencv_camera/frame_height" type="double" value="1080" />
-    <param name="/opencv_camera/frame_rate" type="double" value="30" />
+    <param name="/opencv_camera/frame_rate" type="double" value="15" />
     <!-- Publisher node -->
     <node
         pkg="opencv_camera"
         type="opencv_camera_node"
-        name="main_camera">
-        <remap from="opencv_camera" to="main_camera/image_raw" />
+        name="main_camera">        
+        <remap from="/opencv_camera/image_raw" to="/rosbot/main_camera/image_raw" />
+        <remap from="/opencv_camera/camera_info" to="/rosbot/main_camera/camera_info" />
     </node>
 </launch>
