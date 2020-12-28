@@ -7,7 +7,8 @@
     <node
         pkg="opencv_camera"
         type="opencv_camera_node"
-        name="main_camera">        
+        name="main_camera"
+        ns="rosbot/main_camera/">
         <remap from="/opencv_camera/image_raw" to="/rosbot/main_camera/image_raw" />
         <remap from="/opencv_camera/camera_info" to="/rosbot/main_camera/camera_info" />
     </node>

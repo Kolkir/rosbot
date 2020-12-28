@@ -113,7 +113,7 @@ int main(int argc, char** argv) {
   // CameraInfoManager is responsible for SetCameraInfo service requests, saves
   // and restores sensor_msgs/CameraInfo data.
   camera_info_manager::CameraInfoManager cam_info_manager(
-      node_handler, camera_name, camera_info_url);
+      node_handler, camera_name);
   sensor_msgs::CameraInfo cam_info_msg = cam_info_manager.getCameraInfo();
 
   // Image_transport is responsible for publishing and subscribing to Images
