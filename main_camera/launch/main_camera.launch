@@ -1,8 +1,8 @@
 <launch>
     <param name="/opencv_camera/camera_index" type="int" value="0" />
-    <param name="/opencv_camera/frame_width" type="double" value="1920" />
-    <param name="/opencv_camera/frame_height" type="double" value="1080" />
-    <param name="/opencv_camera/frame_rate" type="double" value="15" />
+    <param name="/opencv_camera/frame_width" type="double" value="640" />
+    <param name="/opencv_camera/frame_height" type="double" value="480" />
+    <param name="/opencv_camera/frame_rate" type="double" value="25" />
     <!-- Publisher node -->
     <node
         pkg="opencv_camera"
