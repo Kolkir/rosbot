@@ -1,8 +1,10 @@
 <launch>
+    <param name="/opencv_camera/name" type="string" value="main_camera" />
+    <param name="/opencv_camera/info_file_url" type="string" value="file:///ros_workspace/src/rosbot/camera_info/main_camera.yaml" />
     <param name="/opencv_camera/camera_index" type="int" value="0" />
     <param name="/opencv_camera/frame_width" type="double" value="640" />
     <param name="/opencv_camera/frame_height" type="double" value="480" />
-    <param name="/opencv_camera/frame_rate" type="double" value="25" />
+    <param name="/opencv_camera/frame_rate" type="double" value="30" />
     <!-- Publisher node -->
     <node
         pkg="opencv_camera"

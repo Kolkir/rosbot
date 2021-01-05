@@ -8,6 +8,8 @@
 
 struct CameraParams {
   int camera_index = 0;
+  std::string name;
+  std::string info_file_url;
   double frame_width = 0.0;
   double frame_height = 0.0;
   double frame_rate = 0.0;
@@ -15,6 +17,20 @@ struct CameraParams {
 
 CameraParams ReadCameraParams(ros::NodeHandle& node_handler) {
   CameraParams params;
+
+  if (!node_handler.param("/opencv_camera/name", params.name,
+                          std::string("opencv_camera"))) {
+    ROS_ERROR_STREAM("Using default camera name");
+  } else {
+    ROS_WARN_STREAM("Camera name param = " << params.name);
+  }
+
+  if (!node_handler.param("/opencv_camera/info_file_url", params.info_file_url,
+                          std::string())) {
+    ROS_ERROR_STREAM("Using default camera info_file_url");
+  } else {
+    ROS_WARN_STREAM("Camera info_file_url param = " << params.info_file_url);
+  }
 
   if (!node_handler.param("/opencv_camera/camera_index", params.camera_index,
                           0)) {
@@ -107,13 +123,10 @@ int main(int argc, char** argv) {
 
   ROS_WARN_STREAM("Frame width = " << frame.cols << " height = " << frame.rows);
 
-  const std::string camera_name = "opencv_camera";
-  std::string camera_info_url;
-
   // CameraInfoManager is responsible for SetCameraInfo service requests, saves
   // and restores sensor_msgs/CameraInfo data.
   camera_info_manager::CameraInfoManager cam_info_manager(
-      node_handler, camera_name);
+      node_handler, params.name, params.info_file_url);
   sensor_msgs::CameraInfo cam_info_msg = cam_info_manager.getCameraInfo();
 
   // Image_transport is responsible for publishing and subscribing to Images
