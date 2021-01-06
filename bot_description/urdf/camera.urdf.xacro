@@ -18,7 +18,7 @@
 </link>
 
 <joint name="top_camera_joint" type="fixed">
-  <origin xyz="0.0  0.0 ${base_height/2 + 0.02}" rpy="0 0 0" />
+  <origin xyz="${base_length/2 - 0.02} 0.0 ${base_height/2 + 0.02}" rpy="0 0 0" />
   <parent link="base_link" />
   <child link="top_camera"/>
 </joint>
@@ -27,10 +27,10 @@
  <sensor type="camera" name="main_camera">
    <update_rate>30.0</update_rate>
    <camera name="head">
-     <horizontal_fov>1.3962634</horizontal_fov>
+     <horizontal_fov>1.57</horizontal_fov>
      <image>
-       <width>800</width>
-       <height>600</height>
+       <width>640</width>
+       <height>480</height>
        <format>R8G8B8</format>
      </image>
      <clip>
@@ -45,21 +45,23 @@
    </camera>
    <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
      <alwaysOn>true</alwaysOn>
-     <updateRate>30.0</updateRate>
+     <updateRate>0.0</updateRate>
      <cameraName>rosbot/main_camera</cameraName>
      <imageTopicName>image_raw</imageTopicName>
      <cameraInfoTopicName>camera_info</cameraInfoTopicName>
      <frameName>camera_link_optical</frameName>
-     <hackBaseline>0.0</hackBaseline>
+     <hackBaseline>0.07</hackBaseline>
      <distortionK1>0.0</distortionK1>
      <distortionK2>0.0</distortionK2>
      <distortionK3>0.0</distortionK3>
      <distortionT1>0.0</distortionT1>
      <distortionT2>0.0</distortionT2>
-     <CxPrime>0</CxPrime>
-     <Cx>0.0</Cx>
-     <Cy>0.0</Cy>
-     <focalLength>0.0</focalLength>
+<!--
+     <CxPrime>320</CxPrime>
+     <Cx>320</Cx>
+     <Cy>240</Cy>
+     <focalLength>381</focalLength>
+-->
    </plugin>
  </sensor>
 </gazebo>
