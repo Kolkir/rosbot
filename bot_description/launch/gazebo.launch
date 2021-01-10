@@ -7,7 +7,9 @@
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
   <arg name="model" default="$(find bot_description)/urdf/bot.urdf.xacro"/>
-  <arg name="world" default="$(find bot_description)/worlds/kitchen_dinning.world" />
+  <!--arg name="world" default="$(find bot_description)/worlds/kitchen_dinning.world" /-->
+  <arg name="world" default="$(find bot_description)/worlds/turtlebot3_house.world" />
+
 
   <!-- the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">

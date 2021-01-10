@@ -34,4 +34,26 @@
        <!--If the node should wait for a camera_info topic to take the camera calibration data-->
        <param name="load_calibration_from_cam" type="bool" value="true" />
   </node>
+
+  <node pkg="nodelet" type="nodelet" name="pcl_filter" args="manager" output="screen" />
+  <node pkg="nodelet" type="nodelet" name="stat_filter"
+        args="load pcl/StatisticalOutlierRemoval pcl_filter">
+    <rosparam>
+      mean_k: 10
+      stddev: 0.5
+      negative: false
+    </rosparam>
+    <remap from="~input" to="/orb_slam2_mono/map_points" />
+    <remap from="~output" to="/rosbot/filtered_points" />
+  </node>
+
+  <include file="$(find bot_navigation)/launch/octomap_server.launch"/>
+
+  <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
+    <param name="default_topic" value="/rosbot/mobile_base_controller/cmd_vel"/>
+    <param name="vx_max" value="0.04"/>
+    <param name="vx_min" value="-0.04"/>
+    <param name="vw_max" value="0.35"/>
+    <param name="vw_min" value="-0.35"/>
+  </node>
 </launch>
