@@ -20,7 +20,7 @@
 
     <!-- Load controller config to the parameter server -->
     <rosparam command="load"
-              file="$(find bot_description)/config/rosbot_control.yaml"/>
+              file="$(find bot_control)/config/rosbot_control.yaml"/>
 
     <!-- Load the controllers -->
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"

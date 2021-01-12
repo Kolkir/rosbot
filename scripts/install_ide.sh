@@ -20,5 +20,8 @@ apt-get install -y libgpiod-dev
 apt-get install -y ros-noetic-costmap-2
 apt-get install -y ros-noetic-octomap-msgs
 apt-get install -y ros-noetic-octomap-server
+apt-get install -y ros-noetic-amcl
+apt-get install -y ros-noetic-move-base
+apt-get install -y ros-noetic-pointcloud-to-laserscan
 
 ln -s /usr/bin/python3 /usr/bin/python

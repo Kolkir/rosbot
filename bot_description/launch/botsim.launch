@@ -9,7 +9,7 @@
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />
 
   <rosparam command="load"
-            file="$(find bot_description)/config/rosbot_control.yaml"/>
+            file="$(find bot_control)/config/rosbot_control.yaml"/>
 
   <!-- Everything works as expected without pid gains for velocity controllers.
        So we don't load this settings because they break wheels positions

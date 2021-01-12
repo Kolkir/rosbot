@@ -23,7 +23,7 @@
     <parent link="base_link"/>
     <child link="${prefix}_wheel"/>
     <origin xyz="${base_length/3.6} ${base_width/2*reflect + wheel_width/2*reflect} -${base_height/2}" rpy="0 0 0"/>
-    <limit effort="10000" velocity="1000"/>
+    <limit effort="10000" velocity="10"/>
     <joint_properties damping="0.0" friction="0.0"/>
   </joint>
 

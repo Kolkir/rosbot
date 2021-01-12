@@ -77,8 +77,8 @@
   <xacro:include filename="$(find bot_description)/urdf/camera.urdf.xacro" />
   <xacro:include filename="$(find bot_description)/urdf/wheel.urdf.xacro" />
 
-  <xacro:wheel prefix="right" reflect="1"/>
-  <xacro:wheel prefix="left" reflect="-1"/>
+  <xacro:wheel prefix="left" reflect="1"/>
+  <xacro:wheel prefix="right" reflect="-1"/>
 
   <link name="rear_wheel">
     <visual>

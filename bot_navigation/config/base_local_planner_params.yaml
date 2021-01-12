@@ -1,0 +1,17 @@
+TrajectoryPlannerROS:
+  # Dynamic Window Approach or Trajectory Rollout
+  dwa: true
+
+  max_vel_x: 0.04
+  min_vel_x: 0.01
+  max_vel_theta: 0.15 # make this velocity lower than it can be to stabilize ORB SLAM localizaton
+  min_vel_theta: 0.1
+  min_in_place_vel_theta: 0.1
+
+  holonomic_robot: false
+
+  # Are distance parameters expressed in units of meters or cells. Cells are assumed by default.
+  meter_scoring: true
+
+  # The weighting for how much the controller should stay close to the path it was given
+  pdist_scale: 0.1
