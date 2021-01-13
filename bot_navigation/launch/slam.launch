@@ -37,6 +37,7 @@
        <param name="load_calibration_from_cam" type="bool" value="true" />
   </node>
 
+<!--
   <node pkg="nodelet" type="nodelet" name="pcl_filter" args="manager" output="screen" />
   <node pkg="nodelet" type="nodelet" name="stat_filter"
         args="load pcl/StatisticalOutlierRemoval pcl_filter">
@@ -58,6 +59,19 @@
     <remap from="~input" to="/rosbot/stat_filtered_points" />
     <remap from="~output" to="/rosbot/filtered_points" />
   </node>
+-->
+
+  <node name="pcl_map" pkg="pcl_map" type="pcl_map_node" output="screen">
+    <param name="frame_id" value="map"/>;
+    <param name="cloud_in" value="/orb_slam2_mono/map_points"/>
+    <param name="cloud_out" value="/rosbot/filtered_points"/>
+    <param name="map_out" value="/map"/>
+    <param name="ground_start_z" value="0.05"/>
+    <param name="ground_end_z" value="0.7"/>
+    <param name="outliers_mean_k" value="10"/>
+    <param name="outliers_stddev" value="0.5"/>
+    <param name="grig_resolution" value="0.02"/>
+  </node>
 
   <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
     <param name="default_topic" value="/rosbot/mobile_base_controller/cmd_vel"/>
@@ -65,6 +79,6 @@
     <param name="vx_min" value="-0.04"/>
     <param name="vw_max" value="0.35"/>
     <param name="vw_min" value="-0.35"/>
-  </node> 
+  </node>
 
 </launch>
