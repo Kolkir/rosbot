@@ -34,7 +34,6 @@ rosbot:
 
     # Top level frame (link) of the robot description
     base_frame_id: base_link
-    # disable publishing odom because ORB SLAM don't use it
     enable_odom_tf: false
 
     # Velocity and acceleration limits for the robot

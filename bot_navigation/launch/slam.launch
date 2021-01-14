@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="tf" type="static_transform_publisher" name="base_link_to_camera" args="-0.0525 0.0 -0.075 0 0 0.0 /top_camera /base_link 100"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_camera" args="-0.0525 0.0 -0.075 0 0 0 /top_camera /base_link 100"/>
 
   <node name="orb_slam2_mono" pkg="orb_slam2_ros" type="orb_slam2_ros_mono" output="screen">
       <remap from="/camera/image_raw" to="/rosbot/main_camera/image_raw"/>
@@ -17,7 +17,7 @@
 
       <param name="pointcloud_frame_id" type="string" value="map" />
       <param name="camera_frame_id" type="string" value="top_camera" />
-      <param name="min_num_kf_in_map" type="int" value="3" />
+      <param name="min_num_kf_in_map" type="int" value="8" />
 
       <!-- ORB parameters -->
       <param name="/ORBextractor/nFeatures" type="int" value="2000" />
@@ -37,30 +37,6 @@
        <param name="load_calibration_from_cam" type="bool" value="true" />
   </node>
 
-<!--
-  <node pkg="nodelet" type="nodelet" name="pcl_filter" args="manager" output="screen" />
-  <node pkg="nodelet" type="nodelet" name="stat_filter"
-        args="load pcl/StatisticalOutlierRemoval pcl_filter">
-    <rosparam>
-      mean_k: 10
-      stddev: 0.5
-      negative: false
-    </rosparam>
-    <remap from="~input" to="/orb_slam2_mono/map_points" />
-    <remap from="~output" to="/rosbot/stat_filtered_points" />
-  </node>     
-  <node pkg="nodelet" type="nodelet" name="passthrough" args="load pcl/PassThrough pcl_filter" output="screen">
-    <rosparam>
-      filter_field_name: z
-      filter_limit_min: 0.05
-      filter_limit_max: 0.3
-      filter_limit_negative: False
-    </rosparam>
-    <remap from="~input" to="/rosbot/stat_filtered_points" />
-    <remap from="~output" to="/rosbot/filtered_points" />
-  </node>
--->
-
   <node name="pcl_map" pkg="pcl_map" type="pcl_map_node" output="screen">
     <param name="frame_id" value="map"/>;
     <param name="cloud_in" value="/orb_slam2_mono/map_points"/>
@@ -71,6 +47,13 @@
     <param name="outliers_mean_k" value="10"/>
     <param name="outliers_stddev" value="0.5"/>
     <param name="grig_resolution" value="0.02"/>
+  </node>
+
+  <node name="orb_slam2_odom" pkg="orb_slam2_odom" type="orb_slam2_odom_node" output="screen">
+    <param name="frame_id" value="odom"/>;
+    <param name="child_frame_id" value="base_link"/>;
+    <param name="pose_in" value="/orb_slam2_mono/pose"/>
+    <param name="odom_topic" value="/odom"/>
   </node>
 
   <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">

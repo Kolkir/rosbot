@@ -9,7 +9,7 @@ robot_radius: 0.1
 
 # dynamic sensor parameters
 obstacle_range: 0.5
-raytrace_range: 3.0
+raytrace_range: 1.5
 
 observation_sources: point_cloud_sensor
 point_cloud_sensor: {sensor_frame: top_camera, data_type: PointCloud2, topic: /octomap_point_cloud_centers, marking: true, clearing: true}
@@ -17,3 +17,4 @@ point_cloud_sensor: {sensor_frame: top_camera, data_type: PointCloud2, topic: /o
 # static map parameters
 inflation_radius: 0.05
 cost_scaling_factor: 1.5
+static_map: false

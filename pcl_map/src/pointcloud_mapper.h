@@ -46,6 +46,8 @@ class PointCloudMapper {
   PclPointCloud::Ptr point_cloud_filtered_ =
       boost::make_shared<PclPointCloud>();
   std::vector<signed char> occupancy_grid_;
+  int grid_width_ = 0;
+  int grid_height_ = 0;
 };
 
 }  // namespace pcl_map

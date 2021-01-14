@@ -61,10 +61,14 @@ nav_msgs::OccupancyGridPtr PointCloudMapper::GenerateOccupancyGrid(
       static_cast<int>((max_point.y - min_point.y) / params_.grid_resolution) +
       1;
 
-  occupancy_grid_.resize(width * height);
+  // don't make the grid smaller because it can lead to errors in other nodes
+  grid_width_ = std::max(grid_width_, width);
+  grid_height_ = std::max(grid_height_, height);
+
+  occupancy_grid_.resize(grid_width_ * grid_height_);
   std::fill(occupancy_grid_.begin(), occupancy_grid_.end(), 0);
   PopulateOccupancyGrid(point_could, occupancy_grid_, min_point.x, min_point.y,
-                        width);
+                        grid_width_);
 
   auto grid = boost::make_shared<nav_msgs::OccupancyGrid>();
   grid->header.seq = 1;
@@ -78,8 +82,8 @@ nav_msgs::OccupancyGridPtr PointCloudMapper::GenerateOccupancyGrid(
   grid->header.stamp.nsec = ros::Time::now().nsec;
   grid->info.map_load_time = ros::Time::now();
   grid->info.resolution = params_.grid_resolution;
-  grid->info.width = width;
-  grid->info.height = height;
+  grid->info.width = grid_width_;
+  grid->info.height = grid_height_;
   grid->info.origin.position.x = min_point.x;
   grid->info.origin.position.y = min_point.y;
   grid->data = occupancy_grid_;
