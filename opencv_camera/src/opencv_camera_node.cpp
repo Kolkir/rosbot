@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
 
   sensor_msgs::ImagePtr msg;
 
-  ros::WallRate loop_rate(ros::Duration(1.0 / params.frame_rate));
+  ros::Rate loop_rate(ros::Duration(1.0 / params.frame_rate));
 
   while (node_handler.ok()) {
     capture >> frame;
@@ -159,7 +159,7 @@ int main(int argc, char** argv) {
           "info.");
       cam_info_msg = MakeDefaultCameraInfo(msg);
     }
-    pub_frame.publish(*msg, cam_info_msg);
+    pub_frame.publish(*msg, cam_info_msg, ros::Time::now());
 
     ros::spinOnce();
     loop_rate.sleep();
