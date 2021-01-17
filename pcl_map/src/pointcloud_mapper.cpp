@@ -78,9 +78,10 @@ nav_msgs::OccupancyGridPtr PointCloudMapper::GenerateOccupancyGrid(
   grid->info.origin.orientation.x = 0;
   grid->info.origin.orientation.y = 0;
   grid->info.origin.orientation.z = 0;
-  grid->header.stamp.sec = ros::Time::now().sec;
-  grid->header.stamp.nsec = ros::Time::now().nsec;
-  grid->info.map_load_time = ros::Time::now();
+  auto cur_time = ros::Time::now();
+  grid->header.stamp.sec = cur_time.sec;
+  grid->header.stamp.nsec = cur_time.nsec;
+  grid->info.map_load_time = cur_time;
   grid->info.resolution = params_.grid_resolution;
   grid->info.width = grid_width_;
   grid->info.height = grid_height_;
