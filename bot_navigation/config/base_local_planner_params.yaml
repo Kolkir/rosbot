@@ -2,10 +2,8 @@ TrajectoryPlannerROS:
   # Dynamic Window Approach or Trajectory Rollout
   dwa: false
 
-  # these parameters should be much greater than actual robot characteristics,
-  # in the case when they are too small robot will be rotating infinetely
-  max_vel_x: 0.5
-  min_vel_x: 0.1
+  max_vel_x: 0.04
+  min_vel_x: 0.01
 
   max_vel_theta: 0.15 # make this velocity lower than it can be to stabilize ORB SLAM localizaton
   min_vel_theta: -0.15

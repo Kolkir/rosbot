@@ -5,7 +5,7 @@ plugins:
 
 # robot parameters
 # footprint: [[x0, y0], [x1, y1], ... [xn, yn]]
-robot_radius: 0.1
+robot_radius: 0.01
 
 # dynamic sensor parameters
 obstacle_range: 0.5
@@ -15,6 +15,6 @@ observation_sources: point_cloud_sensor
 point_cloud_sensor: {sensor_frame: top_camera, data_type: PointCloud2, topic: /octomap_point_cloud_centers, marking: true, clearing: true}
 
 # static map parameters
-inflation_radius: 0.05
-cost_scaling_factor: 1.5
+inflation_radius: 0.08
+cost_scaling_factor: 85.0
 static_map: false
