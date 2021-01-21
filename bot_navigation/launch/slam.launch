@@ -42,11 +42,11 @@
     <param name="cloud_in" value="/orb_slam2_mono/map_points"/>
     <param name="cloud_out" value="/rosbot/filtered_points"/>
     <param name="map_out" value="/map"/>
-    <param name="ground_start_z" value="0.05"/>
-    <param name="ground_end_z" value="0.7"/>
+    <param name="ground_start_z" value="0.001"/>
+    <param name="ground_end_z" value="0.3"/>
     <param name="outliers_mean_k" value="10"/>
     <param name="outliers_stddev" value="0.5"/>
-    <param name="grig_resolution" value="0.02"/>
+    <param name="grig_resolution" value="0.01"/>
   </node>
 
   <node name="orb_slam2_odom" pkg="orb_slam2_odom" type="orb_slam2_odom_node" output="screen">
