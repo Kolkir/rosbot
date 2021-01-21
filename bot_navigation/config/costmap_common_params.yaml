@@ -18,3 +18,5 @@ point_cloud_sensor: {sensor_frame: top_camera, data_type: PointCloud2, topic: /o
 inflation_radius: 0.08
 cost_scaling_factor: 85.0
 static_map: false
+
+resolution: 0.01
