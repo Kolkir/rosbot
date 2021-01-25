@@ -33,42 +33,9 @@ void PointCloudMapper::PointCloudCallback(
   map_pub_.publish(out_msg);
 }
 
-void PointCloudMapper::PopulateOccupancyGrid(
-    PclPointCloud::ConstPtr point_could,
-    std::vector<signed char>& grid,
-    double x_min,
-    double y_min,
-    int width) {
-  for (size_t i = 0; i < point_could->size(); i++) {
-    auto x = point_could->points[i].x;
-    auto y = point_could->points[i].y;
-
-    int x_cell = static_cast<int>((x - x_min) / params_.grid_resolution);
-    int y_cell = static_cast<int>((y - y_min) / params_.grid_resolution);
-    grid[y_cell * width + x_cell] = char(100);
-  }
-}
-
 nav_msgs::OccupancyGridPtr PointCloudMapper::GenerateOccupancyGrid(
     PclPointCloud::ConstPtr point_could) {
-  PclPointCloud::value_type min_point, max_point;
-  pcl::getMinMax3D(*point_could, min_point, max_point);
-
-  int width =
-      static_cast<int>((max_point.x - min_point.x) / params_.grid_resolution) +
-      1;
-  int height =
-      static_cast<int>((max_point.y - min_point.y) / params_.grid_resolution) +
-      1;
-
-  // don't make the grid smaller because it can lead to errors in other nodes
-  grid_width_ = std::max(grid_width_, width);
-  grid_height_ = std::max(grid_height_, height);
-
-  occupancy_grid_.resize(grid_width_ * grid_height_);
-  std::fill(occupancy_grid_.begin(), occupancy_grid_.end(), 0);
-  PopulateOccupancyGrid(point_could, occupancy_grid_, min_point.x, min_point.y,
-                        grid_width_);
+  occupancy_grid_.PopulateOccupancyGrid(point_could);
 
   auto grid = boost::make_shared<nav_msgs::OccupancyGrid>();
   grid->header.seq = 1;
@@ -83,11 +50,11 @@ nav_msgs::OccupancyGridPtr PointCloudMapper::GenerateOccupancyGrid(
   grid->header.stamp.nsec = cur_time.nsec;
   grid->info.map_load_time = cur_time;
   grid->info.resolution = params_.grid_resolution;
-  grid->info.width = grid_width_;
-  grid->info.height = grid_height_;
-  grid->info.origin.position.x = min_point.x;
-  grid->info.origin.position.y = min_point.y;
-  grid->data = occupancy_grid_;
+  grid->info.width = occupancy_grid_.GetWidth();
+  grid->info.height = occupancy_grid_.GetHeight();
+  grid->info.origin.position.x = occupancy_grid_.GetOrigin().x;
+  grid->info.origin.position.y = occupancy_grid_.GetOrigin().y;
+  occupancy_grid_.GetData(grid->data);
 
   return grid;
 }

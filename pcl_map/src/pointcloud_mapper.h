@@ -7,6 +7,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include "node_params.h"
+#include "occupancy_grid.h"
 
 namespace pcl_map {
 
@@ -17,7 +18,10 @@ class PointCloudMapper {
   PointCloudMapper(ros::Publisher& map_pub,
                    ros::Publisher& cloud_pub,
                    const Params& params)
-      : map_pub_(map_pub), cloud_pub_(cloud_pub), params_(params) {}
+      : map_pub_(map_pub),
+        cloud_pub_(cloud_pub),
+        params_(params),
+        occupancy_grid_(params.grid_resolution) {}
   PointCloudMapper(const PointCloudMapper&) = delete;
   PointCloudMapper& operator=(const PointCloudMapper&) = delete;
 
@@ -33,21 +37,13 @@ class PointCloudMapper {
   nav_msgs::OccupancyGridPtr GenerateOccupancyGrid(
       PclPointCloud::ConstPtr point_could);
 
-  void PopulateOccupancyGrid(PclPointCloud::ConstPtr point_could,
-                             std::vector<signed char>& grid,
-                             double x_min,
-                             double y_min,
-                             int width);
-
  private:
   ros::Publisher& map_pub_;
   ros::Publisher& cloud_pub_;
   const Params& params_;
   PclPointCloud::Ptr point_cloud_filtered_ =
       boost::make_shared<PclPointCloud>();
-  std::vector<signed char> occupancy_grid_;
-  int grid_width_ = 0;
-  int grid_height_ = 0;
+  OccupancyGrid occupancy_grid_;
 };
 
 }  // namespace pcl_map

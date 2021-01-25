@@ -14,6 +14,8 @@ find_package(catkin REQUIRED COMPONENTS
              pcl_ros
              nav_msgs)
 
+find_package(OpenCV)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -118,7 +120,8 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 # include
-${catkin_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -137,8 +140,10 @@ ${catkin_INCLUDE_DIRS}
 set (SOURCES
     src/pcl_map_node.cpp
     src/node_params.h
-    src/pointcloud_mapper.h
+    src/pointcloud_mapper.h    
     src/pointcloud_mapper.cpp
+    src/occupancy_grid.h
+    src/occupancy_grid.cpp
     )
 add_executable(${PROJECT_NAME}_node ${SOURCES})
 
@@ -155,6 +160,7 @@ add_executable(${PROJECT_NAME}_node ${SOURCES})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
 )
 
 #############
