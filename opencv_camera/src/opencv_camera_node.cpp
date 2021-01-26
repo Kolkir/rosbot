@@ -32,8 +32,11 @@ int main(int argc, char** argv) {
 
   ros::Rate loop_rate(ros::Duration(1.0 / params.frame_rate));
 
+  camera_thread->Start();
   while (node_handler.ok()) {
     msg = camera_thread->GetFrame();
+    if (!msg)
+      continue;
     // Create a default camera info if we didn't get a stored one on
     // initialization
     if (cam_info_msg.distortion_model == "") {

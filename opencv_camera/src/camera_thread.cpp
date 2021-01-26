@@ -5,7 +5,7 @@ namespace opencv_camera {
 static auto consumer_timeout = std::chrono::milliseconds(10);
 
 CameraThread::CameraThread(std::unique_ptr<Camera> camera)
-    : camera_(std::move(camera)) {
+    : camera_(std::move(camera)), stop_flag_(false) {
   queue_ = std::make_unique<QueueType>(camera_->GetParams().buffer_size);
 }
 
