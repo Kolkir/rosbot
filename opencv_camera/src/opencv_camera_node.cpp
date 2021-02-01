@@ -25,8 +25,9 @@ int main(int argc, char** argv) {
   image_transport::ImageTransport it(node_handler);
 
   // Publish to the /camera topic
+  uint32_t queue_size = static_cast<uint32_t>(params.out_queue_size);
   image_transport::CameraPublisher pub_frame =
-      it.advertiseCamera("/opencv_camera/image_raw", 1);
+      it.advertiseCamera("/opencv_camera/image_raw", queue_size);
 
   sensor_msgs::ImagePtr msg;
 
@@ -45,7 +46,7 @@ int main(int argc, char** argv) {
           "info.");
       cam_info_msg = camera_ptr->GetDefaultInfo();
     }
-    pub_frame.publish(*msg, cam_info_msg, ros::Time::now());
+    pub_frame.publish(*msg, cam_info_msg, msg->header.stamp);
 
     ros::spinOnce();
     loop_rate.sleep();

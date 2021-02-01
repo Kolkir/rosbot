@@ -73,6 +73,7 @@ sensor_msgs::ImagePtr Camera::Capture() {
     exit(1);
   }
   msg_ = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame_).toImageMsg();
+  msg_->header.stamp = ros::Time::now();
   return msg_;
 }
 

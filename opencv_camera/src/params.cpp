@@ -11,6 +11,13 @@ CameraParams ReadCameraParams(ros::NodeHandle& node_handler) {
     ROS_WARN_STREAM("Camera buffer size = " << params.buffer_size);
   }
 
+  if (!node_handler.param("/opencv_camera/out_queue_size", params.out_queue_size,
+                          30)) {
+    ROS_ERROR_STREAM("Using default queue size");
+  } else {
+    ROS_WARN_STREAM("Camera queue size = " << params.out_queue_size);
+  }
+
   if (!node_handler.param("/opencv_camera/name", params.name,
                           std::string("opencv_camera"))) {
     ROS_ERROR_STREAM("Using default camera name");

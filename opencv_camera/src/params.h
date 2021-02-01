@@ -12,6 +12,7 @@ struct CameraParams {
   double frame_height = 0.0;
   double frame_rate = 0.0;
   int buffer_size = 100;
+  int out_queue_size = 30;
 };
 
 CameraParams ReadCameraParams(ros::NodeHandle& node_handler);
