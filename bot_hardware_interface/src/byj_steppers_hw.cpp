@@ -37,7 +37,7 @@ BYJSteppersHW::BYJSteppersHW(ros::NodeHandle& node_handle)
 double BYJSteppersHW::GetMotorAngle(size_t index) {
   switch (index) {
     case 0:
-      return left_motor_->GetAngle();
+      return -left_motor_->GetAngle();
       break;
     case 1:
       return right_motor_->GetAngle();
@@ -173,17 +173,8 @@ BYJStepper::Direction BYJStepper::GetOpositeDirection(
   return CW;
 }
 
-int32_t BYJStepper::GetHalfStepIndex() const {
-  int32_t ticks = ticks_.load();
-  if (ticks >= 0) {
-    return ticks;
-  } else {
-    return half_step_ticks_count + ticks;
-  }
-}
-
 double BYJStepper::GetAngle() const {
-  auto half_step_index = GetHalfStepIndex();
+  auto half_step_index = ticks_.load();
   auto angle = half_step_index * angle_per_tick;
   return angle;
 }

@@ -70,7 +70,9 @@ void BotHardwareInterface::read(const ros::Time& /*time*/
   double wheel_angle_deltas[2] = {0, 0};
   for (std::size_t i = 0; i < num_joints_; ++i) {
     wheel_angles[i] = GetMotorAngle(i);
+    ROS_INFO_STREAM("Motor " << i << " angle " << (wheel_angles[i]*180.0)/M_PI);
     wheel_angle_deltas[i] = wheel_angles[i] - joint_positions_[i];
+    ROS_INFO_STREAM("Motor delta" << i << " value" << (wheel_angle_deltas[i]*180)/M_PI);
 
     joint_positions_[i] = wheel_angles[i];
     joint_velocities_[i] = wheel_angle_deltas[i] / period.toSec();

@@ -29,8 +29,6 @@ class BYJStepper {
  private:
   void HWUpdate(const ros::WallTimerEvent& event);
 
-  int32_t GetHalfStepIndex() const;
-
   static Direction GetOpositeDirection(Direction dir);
 
  private:
