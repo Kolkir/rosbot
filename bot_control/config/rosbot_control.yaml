@@ -36,7 +36,7 @@ rosbot:
     # Top level frame (link) of the robot description
     base_frame_id: base_link
     enable_odom_tf: true
-    odom_frame_id: '/rosbot/odom'
+    odom_frame_id: rosbot_odom
 
     # Velocity and acceleration limits for the robot
     linear:

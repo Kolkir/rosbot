@@ -29,6 +29,8 @@ class BYJStepper {
  private:
   void HWUpdate(const ros::WallTimerEvent& event);
 
+  int32_t GetHalfStepIndex() const;
+
   static Direction GetOpositeDirection(Direction dir);
 
  private:
@@ -36,11 +38,10 @@ class BYJStepper {
   ros::WallTimer timer_;
   ros::WallDuration timeout_{1.0};  // seconds
   size_t halfstep_ = 0;
-  std::atomic<size_t> ticks_;
+  std::atomic<int32_t> ticks_;
   std::vector<size_t> pins_;
   Direction direction_ = CW;
   Direction original_direction_ = CW;
-  double const steps_per_rotation_ = 4076;  // in the half-step mode
 };
 
 class BYJSteppersHW : public BotHardwareInterface {

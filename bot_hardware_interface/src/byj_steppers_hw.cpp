@@ -6,9 +6,9 @@ static std::vector<std::vector<size_t>> halfstep_seq = {
     {1, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 1, 0},
     {0, 0, 1, 0}, {0, 0, 1, 1}, {0, 0, 0, 1}, {1, 0, 0, 1}};
 
-static size_t half_step_ticks_count = 4076;
+static int32_t half_step_ticks_count = 4076;  // in the half-step mode
 
-static double angle_per_tick = 0.003067962;  // radians
+static double angle_per_tick = (2 * M_PI) / half_step_ticks_count;  // radians
 
 BYJSteppersHW::BYJSteppersHW(ros::NodeHandle& node_handle)
     : BotHardwareInterface(node_handle) {
@@ -104,15 +104,14 @@ BYJStepper::BYJStepper(ros::NodeHandle& node_handle,
     exit(1);
   }
   gpio_->ConfigureOutputPints(pins_);
-  timer_ = node_handle.createWallTimer(timeout_,
-                                       &BYJStepper::HWUpdate, this,
+  timer_ = node_handle.createWallTimer(timeout_, &BYJStepper::HWUpdate, this,
                                        /*oneshot*/ false, /*autostart*/ false);
 }
 
 void BYJStepper::SetRPM(double rpm) {
   auto seconds_timeout = ros::WallDuration();
   if (rpm > 0) {
-    seconds_timeout = ros::WallDuration(60.0 / (rpm * steps_per_rotation_));
+    seconds_timeout = ros::WallDuration(60.0 / (rpm * half_step_ticks_count));
   }
   timeout_ = seconds_timeout;
   const double one_millisec = 0.001;
@@ -141,17 +140,22 @@ void BYJStepper::HWUpdate(const ros::WallTimerEvent& /*event*/) {
     if (halfstep_ >= halfstep_seq.size()) {
       halfstep_ = 0;
     }
+
+    ticks_ += 1;
+    if (ticks_.load() >= half_step_ticks_count) {
+      ticks_ = 0;
+    }
   } else {
     if (halfstep_ == 0) {
       halfstep_ = halfstep_seq.size() - 1;
     } else {
       halfstep_ -= 1;
     }
-  }
 
-  ticks_ += 1;
-  if (ticks_.load() >= half_step_ticks_count) {
-    ticks_ = 0;
+    ticks_ -= 1;
+    if (ticks_.load() <= -half_step_ticks_count) {
+      ticks_ = 0;
+    }
   }
 }
 
@@ -169,15 +173,17 @@ BYJStepper::Direction BYJStepper::GetOpositeDirection(
   return CW;
 }
 
+int32_t BYJStepper::GetHalfStepIndex() const {
+  int32_t ticks = ticks_.load();
+  if (ticks >= 0) {
+    return ticks;
+  } else {
+    return half_step_ticks_count + ticks;
+  }
+}
+
 double BYJStepper::GetAngle() const {
-  auto ticks = ticks_.load();
-  auto angle = ticks * angle_per_tick;
-
-  // normalize
-  angle = fmod(angle, 2.0 * M_PI);
-
-  if (angle < 0)
-    angle += 2.0 * M_PI;
-
+  auto half_step_index = GetHalfStepIndex();
+  auto angle = half_step_index * angle_per_tick;
   return angle;
 }

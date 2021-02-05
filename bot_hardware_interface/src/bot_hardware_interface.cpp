@@ -72,7 +72,7 @@ void BotHardwareInterface::read(const ros::Time& /*time*/
     wheel_angles[i] = GetMotorAngle(i);
     wheel_angle_deltas[i] = wheel_angles[i] - joint_positions_[i];
 
-    joint_positions_[i] += wheel_angle_deltas[i];
+    joint_positions_[i] = wheel_angles[i];
     joint_velocities_[i] = wheel_angle_deltas[i] / period.toSec();
     joint_efforts_[i] = 0.0;  // unused with diff_drive_controller
   }
