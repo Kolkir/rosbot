@@ -6,8 +6,8 @@
   <param name="cloud_out" value="/rosbot/filtered_points"/>
   <param name="map_out" value="/map"/>
   <!-- ground level is below the optical axis -->
-  <param name="ground_start_z" value="-0.01"/>
-  <param name="ground_end_z" value="0.3"/>
+  <param name="ground_start_z" value="0.05"/>
+  <param name="ground_end_z" value="0.7"/>
   <param name="outliers_mean_k" value="15"/>
   <param name="outliers_stddev" value="0.05"/>
   <param name="grig_resolution" value="0.01"/>
