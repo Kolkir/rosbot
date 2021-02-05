@@ -27,14 +27,14 @@ class BYJStepper {
   double GetAngle() const;
 
  private:
-  void HWUpdate(const ros::WallTimerEvent& event);
+  void HWUpdate(const ros::TimerEvent& event);
 
   static Direction GetOpositeDirection(Direction dir);
 
  private:
   std::shared_ptr<GPIOBase> gpio_;
-  ros::WallTimer timer_;
-  ros::WallDuration timeout_{1.0};  // seconds
+  ros::Timer timer_;
+  ros::Duration timeout_{1.0};  // seconds
   size_t halfstep_ = 0;
   std::atomic<int32_t> ticks_;
   std::vector<size_t> pins_;

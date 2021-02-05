@@ -104,14 +104,14 @@ BYJStepper::BYJStepper(ros::NodeHandle& node_handle,
     exit(1);
   }
   gpio_->ConfigureOutputPints(pins_);
-  timer_ = node_handle.createWallTimer(timeout_, &BYJStepper::HWUpdate, this,
+  timer_ = node_handle.createTimer(timeout_, &BYJStepper::HWUpdate, this,
                                        /*oneshot*/ false, /*autostart*/ false);
 }
 
 void BYJStepper::SetRPM(double rpm) {
-  auto seconds_timeout = ros::WallDuration();
+  auto seconds_timeout = ros::Duration();
   if (rpm > 0) {
-    seconds_timeout = ros::WallDuration(60.0 / (rpm * half_step_ticks_count));
+    seconds_timeout = ros::Duration(60.0 / (rpm * half_step_ticks_count));
   }
   timeout_ = seconds_timeout;
   const double one_millisec = 0.001;
@@ -132,7 +132,7 @@ void BYJStepper::SetOpositeDirection() {
   direction_ = GetOpositeDirection(original_direction_);
 }
 
-void BYJStepper::HWUpdate(const ros::WallTimerEvent& /*event*/) {
+void BYJStepper::HWUpdate(const ros::TimerEvent& /*event*/) {
   gpio_->Output(pins_, halfstep_seq[halfstep_]);
 
   if (direction_ == Direction::CW) {
