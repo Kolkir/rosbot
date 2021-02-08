@@ -65,20 +65,14 @@ void BotHardwareInterface::read(const ros::Time& /*time*/,
                                 const ros::Duration& period) {
   // Read from robot hw (motor encoders)
   // Fill joint_state_* members with read values
-  double wheel_angles[2] = {0, 0};
+  double cur_wheel_angles[2] = {0, 0};
   double wheel_angle_deltas[2] = {0, 0};
   for (std::size_t i = 0; i < num_joints_; ++i) {
-    wheel_angles[i] = GetMotorAngle(i);
-    wheel_angle_deltas[i] = wheel_angles[i] - joint_positions_[i];
+    cur_wheel_angles[i] = GetMotorAngle(i);
+    wheel_angle_deltas[i] = cur_wheel_angles[i] - joint_positions_[i];
 
-    joint_positions_[i] = wheel_angles[i];
+    joint_positions_[i] += wheel_angle_deltas[i];
     joint_velocities_[i] = wheel_angle_deltas[i] / period.toSec();
-
-    ROS_INFO_STREAM("Motor " << i);
-    ROS_INFO_STREAM("\tangle " << (wheel_angles[i]*180.0)/M_PI);
-    ROS_INFO_STREAM("\t delta " << (wheel_angle_deltas[i]*180)/M_PI);
-    ROS_INFO_STREAM("\t velocity " << joint_velocities_[i]);
-
     joint_efforts_[i] = 0.0;  // unused with diff_drive_controller
   }
 }

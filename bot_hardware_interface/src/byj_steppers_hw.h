@@ -24,11 +24,11 @@ class BYJStepper {
 
   void SetOpositeDirection();
 
-  double GetAngle() const;
+  double GetAngleAccumulated() const;
 
  private:
   void HWUpdate(const ros::TimerEvent& event);
-
+  void Stop();
   static Direction GetOpositeDirection(Direction dir);
 
  private:
@@ -36,10 +36,10 @@ class BYJStepper {
   ros::Timer timer_;
   ros::Duration timeout_{1.0};  // seconds
   size_t halfstep_ = 0;
-  std::atomic<int32_t> ticks_;
   std::vector<size_t> pins_;
   Direction direction_ = CW;
   Direction original_direction_ = CW;
+  std::atomic<double> angle_accumulated_;
 };
 
 class BYJSteppersHW : public BotHardwareInterface {
@@ -48,11 +48,11 @@ class BYJSteppersHW : public BotHardwareInterface {
 
   // BotHardwareInterface interface
  private:
-  double GetMotorAngle(size_t index);
+  double GetMotorAngle(size_t index) override;
   void SetMotorVelocity(size_t index,
                         double measured_value,
                         double setpoint,
-                        const ros::Duration& dt);
+                        const ros::Duration& dt) override;
 
  private:
   void SetLinearVelocity(size_t index, double value);
