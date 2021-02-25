@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.10)
 project(bot_hardware_interface)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
