@@ -6,9 +6,9 @@ static std::vector<std::vector<size_t>> halfstep_seq = {
     {1, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 1, 0},
     {0, 0, 1, 0}, {0, 0, 1, 1}, {0, 0, 0, 1}, {1, 0, 0, 1}};
 
-static size_t half_step_ticks_count = 4076;
+static int32_t half_step_ticks_count = 4076;  // in the half-step mode
 
-static double angle_per_tick = 0.003067962;  // radians
+static double angle_per_tick = (2 * M_PI) / half_step_ticks_count;  // radians
 
 BYJSteppersHW::BYJSteppersHW(ros::NodeHandle& node_handle)
     : BotHardwareInterface(node_handle) {
@@ -37,11 +37,9 @@ BYJSteppersHW::BYJSteppersHW(ros::NodeHandle& node_handle)
 double BYJSteppersHW::GetMotorAngle(size_t index) {
   switch (index) {
     case 0:
-      return left_motor_->GetAngle();
-      break;
+      return -left_motor_->GetAngleAccumulated();
     case 1:
-      return right_motor_->GetAngle();
-      break;
+      return right_motor_->GetAngleAccumulated();
     default:
       ROS_ERROR_STREAM(
           "BYJSteppersHW::GetMotorAngle failed with incorrect motor index "
@@ -97,28 +95,31 @@ BYJStepper::BYJStepper(ros::NodeHandle& node_handle,
                        std::shared_ptr<GPIOBase> gpio,
                        std::vector<size_t> pins,
                        Direction dir)
-    : gpio_(gpio), ticks_(0), pins_(pins), original_direction_(dir) {
+    : gpio_(gpio), pins_(pins), original_direction_(dir) {
   if (pins_.size() != 4) {
     ROS_ERROR_STREAM("Incorrect number of pins for a motor");
     ros::shutdown();
     exit(1);
   }
   gpio_->ConfigureOutputPints(pins_);
-  timer_ = node_handle.createWallTimer(timeout_,
-                                       &BYJStepper::HWUpdate, this,
-                                       /*oneshot*/ false, /*autostart*/ false);
+  timer_ = node_handle.createTimer(timeout_, &BYJStepper::HWUpdate, this,
+                                   /*oneshot*/ false, /*autostart*/ false);
+}
+
+void BYJStepper::Stop() {
+  timer_.stop();
+  gpio_->Output(pins_, {0, 0, 0, 0});
 }
 
 void BYJStepper::SetRPM(double rpm) {
-  auto seconds_timeout = ros::WallDuration();
+  auto seconds_timeout = ros::Duration();
   if (rpm > 0) {
-    seconds_timeout = ros::WallDuration(60.0 / (rpm * steps_per_rotation_));
+    seconds_timeout = ros::Duration(60.0 / (rpm * half_step_ticks_count));
   }
   timeout_ = seconds_timeout;
   const double one_millisec = 0.001;
   if (timeout_.toSec() < one_millisec) {
-    timer_.stop();
-    gpio_->Output(pins_, {0, 0, 0, 0});
+    Stop();
   } else {
     timer_.setPeriod(timeout_);
     timer_.start();
@@ -133,7 +134,7 @@ void BYJStepper::SetOpositeDirection() {
   direction_ = GetOpositeDirection(original_direction_);
 }
 
-void BYJStepper::HWUpdate(const ros::WallTimerEvent& /*event*/) {
+void BYJStepper::HWUpdate(const ros::TimerEvent& /*event*/) {
   gpio_->Output(pins_, halfstep_seq[halfstep_]);
 
   if (direction_ == Direction::CW) {
@@ -141,17 +142,14 @@ void BYJStepper::HWUpdate(const ros::WallTimerEvent& /*event*/) {
     if (halfstep_ >= halfstep_seq.size()) {
       halfstep_ = 0;
     }
+    angle_accumulated_ = angle_accumulated_.load() + angle_per_tick;
   } else {
     if (halfstep_ == 0) {
       halfstep_ = halfstep_seq.size() - 1;
     } else {
       halfstep_ -= 1;
     }
-  }
-
-  ticks_ += 1;
-  if (ticks_.load() >= half_step_ticks_count) {
-    ticks_ = 0;
+    angle_accumulated_ = angle_accumulated_.load() - angle_per_tick;
   }
 }
 
@@ -169,15 +167,6 @@ BYJStepper::Direction BYJStepper::GetOpositeDirection(
   return CW;
 }
 
-double BYJStepper::GetAngle() const {
-  auto ticks = ticks_.load();
-  auto angle = ticks * angle_per_tick;
-
-  // normalize
-  angle = fmod(angle, 2.0 * M_PI);
-
-  if (angle < 0)
-    angle += 2.0 * M_PI;
-
-  return angle;
+double BYJStepper::GetAngleAccumulated() const {
+  return angle_accumulated_.load();
 }

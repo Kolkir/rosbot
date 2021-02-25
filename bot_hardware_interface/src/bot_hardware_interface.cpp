@@ -61,16 +61,15 @@ bool BotHardwareInterface::init(ros::NodeHandle& /*root_nh*/,
   return true;
 }
 
-void BotHardwareInterface::read(const ros::Time& /*time*/
-                                ,
+void BotHardwareInterface::read(const ros::Time& /*time*/,
                                 const ros::Duration& period) {
   // Read from robot hw (motor encoders)
   // Fill joint_state_* members with read values
-  double wheel_angles[2] = {0, 0};
+  double cur_wheel_angles[2] = {0, 0};
   double wheel_angle_deltas[2] = {0, 0};
   for (std::size_t i = 0; i < num_joints_; ++i) {
-    wheel_angles[i] = GetMotorAngle(i);
-    wheel_angle_deltas[i] = wheel_angles[i] - joint_positions_[i];
+    cur_wheel_angles[i] = GetMotorAngle(i);
+    wheel_angle_deltas[i] = cur_wheel_angles[i] - joint_positions_[i];
 
     joint_positions_[i] += wheel_angle_deltas[i];
     joint_velocities_[i] = wheel_angle_deltas[i] / period.toSec();

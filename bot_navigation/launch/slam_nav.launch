@@ -1,0 +1,23 @@
+<launch>
+
+<node name="pcl_map" pkg="pcl_map" type="pcl_map_node" output="screen">
+  <param name="frame_id" value="map"/>;
+  <param name="cloud_in" value="/orb_slam2_mono/map_points"/>
+  <param name="cloud_out" value="/rosbot/filtered_points"/>
+  <param name="map_out" value="/map"/>
+  <!-- ground level is below the optical axis -->
+  <param name="ground_start_z" value="0.05"/>
+  <param name="ground_end_z" value="0.7"/>
+  <param name="outliers_mean_k" value="15"/>
+  <param name="outliers_stddev" value="0.05"/>
+  <param name="grig_resolution" value="0.01"/>
+</node>
+
+<node name="orb_slam2_odom" pkg="orb_slam2_odom" type="orb_slam2_odom_node" output="screen">
+  <param name="frame_id" value="odom"/>;
+  <param name="child_frame_id" value="base_link"/>;
+  <param name="pose_in" value="/orb_slam2_mono/pose"/>
+  <param name="odom_topic" value="/odom"/>
+</node>
+
+</launch>

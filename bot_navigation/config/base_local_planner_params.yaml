@@ -26,3 +26,13 @@ TrajectoryPlannerROS:
   # 0.0 prevents robot to move backward along the trajectory
   escape_vel: -0.01
 
+  # Forward Simulation Parameters
+
+  # The amount of time to forward-simulate trajectories in seconds
+  sim_time: 2.5
+
+  # The step size, in meters, to take between points on a given trajectory
+  sim_granularity: 0.01
+
+  # The frequency at which this controller will be called in Hz.
+  controller_frequency: 10
