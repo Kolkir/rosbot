@@ -149,8 +149,8 @@ target_sources(${PROJECT_NAME}_node
   src/byj_steppers_hw.cpp
   src/gpio_base.h
   src/gpio_base.cpp
-  src/gpio_opi.h
-  src/gpio_opi.cpp
+  src/gpio_impl.h
+  src/gpio_impl.cpp
   )
 
 add_compile_options(-Wall -Wextra)

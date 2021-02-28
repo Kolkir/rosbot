@@ -4,11 +4,12 @@
 
     <!-- Configure HW backend implementation -->
     <param name="rosbot/hw_backend" type="string" value="byj" />
+    <param name="rosbot/gpio_chip_name" type="string" value="gpiochip0" />
     <rosparam param="rosbot/left_motor_pins">
-      [12.0, 11.0, 6.0, 3.0]
+      [216.0, 50.0, 14.0, 194.0]
     </rosparam>
     <rosparam param="rosbot/right_motor_pins">
-      [19.0, 18.0, 2.0, 13.0]
+      [149.0, 200.0, 38.0, 76.0]
     </rosparam>
 
     <!-- Load the URDF model of DiffBot into the ROS Parameter Server -->

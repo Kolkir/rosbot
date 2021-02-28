@@ -1,6 +1,6 @@
 #include "byj_steppers_hw.h"
 #include <rosparam_shortcuts/rosparam_shortcuts.h>
-#include "gpio_opi.h"
+#include "gpio_impl.h"
 
 static std::vector<std::vector<size_t>> halfstep_seq = {
     {1, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 1, 0},
@@ -21,12 +21,15 @@ BYJSteppersHW::BYJSteppersHW(ros::NodeHandle& node_handle)
   std::vector<double> right_pins;
   error += !rosparam_shortcuts::get("rosbot", node_handle, "right_motor_pins",
                                     right_pins);
+  std::string gpio_chip_name;
+  error += !rosparam_shortcuts::get("rosbot", node_handle, "gpio_chip_name",
+                                    gpio_chip_name);
   rosparam_shortcuts::shutdownIfError("rosbot", error);
 
   std::vector<size_t> left_control_pins(left_pins.begin(), left_pins.end());
   std::vector<size_t> right_control_pins(right_pins.begin(), right_pins.end());
 
-  gpio_ = std::make_shared<GPIO_OPI>();
+  gpio_ = std::make_shared<GPIOImpl>(gpio_chip_name);
   // gpio_ = std::make_shared<GPIO_Log>();
   left_motor_ = std::make_unique<BYJStepper>(
       node_handle, gpio_, left_control_pins, BYJStepper::CCW);

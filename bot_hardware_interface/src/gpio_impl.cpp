@@ -1,10 +1,12 @@
-#include "gpio_opi.h"
+#include "gpio_impl.h"
 
 #include <gpiod.h>
 #include <ros/ros.h>
 #include <cassert>
 
-GPIO_OPI::GPIO_OPI() : chip_(nullptr, [](gpiod_chip*) {}) {
+GPIOImpl::GPIOImpl(const std::string& chip_name)
+    : gpio_chip_name_(chip_name)
+    , chip_(nullptr, [](gpiod_chip*) {}) {
   auto* chip = gpiod_chip_open_by_name(gpio_chip_name_.data());
   if (!chip) {
     ROS_ERROR_STREAM("Failed to open GPIO chip : " << gpio_chip_name_);
@@ -13,9 +15,9 @@ GPIO_OPI::GPIO_OPI() : chip_(nullptr, [](gpiod_chip*) {}) {
   chip_ = ChipPtr(chip, [](gpiod_chip* chip) { gpiod_chip_close(chip); });
 }
 
-GPIO_OPI::~GPIO_OPI() {}
+GPIOImpl::~GPIOImpl() {}
 
-void GPIO_OPI::Output(const std::vector<size_t>& pins,
+void GPIOImpl::Output(const std::vector<size_t>& pins,
                       const std::vector<size_t>& values) {
   assert(pins.size() == values.size());
   if (pins_.empty()) {
@@ -37,7 +39,7 @@ void GPIO_OPI::Output(const std::vector<size_t>& pins,
   }
 }
 
-void GPIO_OPI::ConfigureOutputPints(const std::vector<size_t>& pins) {
+void GPIOImpl::ConfigureOutputPints(const std::vector<size_t>& pins) {
   for (auto pin_num : pins) {
     auto* pin = gpiod_chip_get_line(chip_.get(), pin_num);
     if (!pin) {
