@@ -22,8 +22,8 @@ rosbot:
     # Wheel separation and diameter. These are both optional.
     # diff_drive_controller will attempt to read either one or both from the
     # URDF if not specified as a parameter
-    wheel_separation : 0.11
-    wheel_radius : 0.025
+    wheel_separation : 0.15
+    wheel_radius : 0.0335
 
     # Odometry covariances for the encoder output of the robot. These values should
     # be tuned to your robot's sample odometry data, but these values are a good place
