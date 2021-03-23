@@ -1,7 +1,4 @@
 <launch>
-    <!-- Start HW main_camera -->
-    <include file="$(find main_camera)/launch/main_camera.launch" />
-
     <!-- Configure HW backend implementation -->
     <param name="rosbot/hw_backend" type="string" value="byj" />
     <param name="rosbot/gpio_chip_name" type="string" value="gpiochip0" />
