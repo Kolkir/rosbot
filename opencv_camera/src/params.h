@@ -15,7 +15,7 @@ struct CameraParams {
   int out_queue_size = 30;
 };
 
-CameraParams ReadCameraParams(ros::NodeHandle& node_handler);
+CameraParams ReadCameraParams(ros::NodeHandle& node_handle);
 }  // namespace opencv_camera
 
 #endif  // PARAMS_H
