@@ -1,0 +1,9 @@
+<library path="lib/libopencv_camera">
+  <class name="opencv_camera/VideoStream"
+         type="opencv_camera::CameraNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      A nodelet to publish a video stream
+    </description>
+  </class>
+</library>

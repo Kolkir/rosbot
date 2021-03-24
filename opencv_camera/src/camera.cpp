@@ -1,5 +1,6 @@
 #include "camera.h"
 #include <cv_bridge/cv_bridge.h>
+#include <nodelet/nodelet.h>
 #include <boost/assign/list_of.hpp>
 
 namespace opencv_camera {

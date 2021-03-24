@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   std_msgs
+  nodelet
 )
 
 find_package(OpenCV)
@@ -147,6 +148,8 @@ set (SOURCES
     src/camera.cpp
     src/camera_thread.h
     src/camera_thread.cpp
+    src/camera_nodelet.h
+    src/camera_nodelet.cpp
 )
 
 add_executable(${PROJECT_NAME}_node ${SOURCES})

@@ -1,7 +1,16 @@
 <launch>
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_camera" args="0 0 -0.075 0 0 0 /top_camera /base_link 100"/>
 
-  <node name="orb_slam2_mono" pkg="orb_slam2_ros" type="orb_slam2_ros_mono" output="screen">
+  <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager"/>
+
+  <!-- Start main_camera -->
+  <include file="$(find main_camera)/launch/main_camera.launch" />
+
+  <node pkg="nodelet"
+        type="nodelet"
+        name="orb_slam2_ros_mono"
+        args="load orb_slam2_ros/MonoSlam standalone_nodelet"
+        output="screen">
       <remap from="/camera/image_raw" to="/rosbot/main_camera/image_raw"/>
       <remap from="/camera/camera_info" to="/rosbot/main_camera/camera_info"/>
       <remap from="/odom" to="/rosbot/mobile_base_controller/odom"/>
