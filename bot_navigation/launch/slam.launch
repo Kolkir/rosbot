@@ -1,55 +1,56 @@
 <launch>
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_camera" args="0 0 -0.075 0 0 0 /top_camera /base_link 100"/>
 
-  <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager"/>
+  <!--<node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager" ns="rosbot" output="screen"/>-->
 
   <!-- Start main_camera -->
-  <include file="$(find main_camera)/launch/main_camera.launch" />
+  <!--<include file="$(find main_camera)/launch/main_camera.launch" />-->
+
+<param name="publish_pointcloud" type="bool" value="true" />
+<param name="publish_pose" type="bool" value="true" />
+<param name="localize_only" type="bool" value="false" />
+<param name="reset_map" type="bool" value="false" />
+
+<!-- static parameters -->
+<param name="load_map" type="bool" value="false" />
+<param name="map_file" type="string" value="map.bin" />
+<param name="voc_file" type="string" value="$(find orb_slam2_ros)/orb_slam2/Vocabulary/ORBvoc.txt" />
+
+<param name="pointcloud_frame_id" type="string" value="map" />
+<param name="camera_frame_id" type="string" value="top_camera" />
+
+<!-- Number of key frames a map has to have to not get reset after tracking is lost. -->
+<param name="min_num_kf_in_map" type="int" value="3" />
+
+<!-- Number of minimal observations a key point must have to be published in the point cloud -->
+<!--<param name="min_observations_for_ros_map" value="5" />-->
+
+<!-- ORB parameters -->
+<param name="/ORBextractor/nFeatures" type="int" value="1200" />
+<param name="/ORBextractor/scaleFactor" type="double" value="1.2" />
+<param name="/ORBextractor/nLevels" type="int" value="8" />
+<param name="/ORBextractor/iniThFAST" type="int" value="20" />
+<param name="/ORBextractor/minThFAST" type="int" value="7" />
+
+ <!-- Camera parameters -->
+ <!-- Camera frames per second -->
+ <param name="camera_fps" type="int" value="5" />
+ <!-- Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale) -->
+ <param name="camera_rgb_encoding" type="bool" value="true" />
+
+ <!-- Camera calibration parameters -->
+ <!--If the node should wait for a camera_info topic to take the camera calibration data-->
+ <param name="load_calibration_from_cam" type="bool" value="true" />
 
   <node pkg="nodelet"
         type="nodelet"
-        name="orb_slam2_ros_mono"
+        name="orb_slam"
         args="load orb_slam2_ros/MonoSlam standalone_nodelet"
-        output="screen">
+        output="screen"
+        ns="rosbot">
       <remap from="/camera/image_raw" to="/rosbot/main_camera/image_raw"/>
       <remap from="/camera/camera_info" to="/rosbot/main_camera/camera_info"/>
       <remap from="/odom" to="/rosbot/mobile_base_controller/odom"/>
-
-      <param name="publish_pointcloud" type="bool" value="true" />
-      <param name="publish_pose" type="bool" value="true" />
-      <param name="localize_only" type="bool" value="false" />
-      <param name="reset_map" type="bool" value="false" />
-
-      <!-- static parameters -->
-      <param name="load_map" type="bool" value="false" />
-      <param name="map_file" type="string" value="map.bin" />
-      <param name="voc_file" type="string" value="$(find orb_slam2_ros)/orb_slam2/Vocabulary/ORBvoc.txt" />
-
-      <param name="pointcloud_frame_id" type="string" value="map" />
-      <param name="camera_frame_id" type="string" value="top_camera" />
-
-      <!-- Number of key frames a map has to have to not get reset after tracking is lost. -->
-      <param name="min_num_kf_in_map" type="int" value="3" />
-
-     <!-- Number of minimal observations a key point must have to be published in the point cloud -->
-      <!--<param name="min_observations_for_ros_map" value="5" />-->
-
-      <!-- ORB parameters -->
-      <param name="/ORBextractor/nFeatures" type="int" value="2000" />
-      <param name="/ORBextractor/scaleFactor" type="double" value="1.2" />
-      <param name="/ORBextractor/nLevels" type="int" value="8" />
-      <param name="/ORBextractor/iniThFAST" type="int" value="20" />
-      <param name="/ORBextractor/minThFAST" type="int" value="7" />
-
-       <!-- Camera parameters -->
-       <!-- Camera frames per second -->
-       <param name="camera_fps" type="int" value="10" />
-       <!-- Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale) -->
-       <param name="camera_rgb_encoding" type="bool" value="true" />
-
-       <!-- Camera calibration parameters -->
-       <!--If the node should wait for a camera_info topic to take the camera calibration data-->
-       <param name="load_calibration_from_cam" type="bool" value="true" />
   </node>
 
   <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">

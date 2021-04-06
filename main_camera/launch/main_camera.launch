@@ -1,18 +1,20 @@
 <launch>
+    <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager" ns="rosbot" output="screen"/>
+
     <param name="/opencv_camera/name" type="string" value="main_camera" />
-    <param name="/opencv_camera/info_file_url" type="string" value="file:///home/kirill/dev/ros_workspace/src/rosbot/camera_info/main_camera.yaml" />
+    <param name="/opencv_camera/info_file_url" type="string" value="file:///home/kirill/development/ros_workspace/src/rosbot/camera_info/main_camera.yaml" />
     <param name="/opencv_camera/camera_index" type="int" value="0" />
-    <param name="/opencv_camera/frame_width" type="double" value="640" />
-    <param name="/opencv_camera/frame_height" type="double" value="480" />
-    <param name="/opencv_camera/frame_rate" type="double" value="30" />
-    <param name="/opencv_camera/buffer_size" type="int" value="500" />
+    <param name="/opencv_camera/frame_width" type="double" value="1280" />
+    <param name="/opencv_camera/frame_height" type="double" value="960" />
+    <param name="/opencv_camera/frame_rate" type="double" value="7.5" />
+    <param name="/opencv_camera/buffer_size" type="int" value="50" />
     <!-- Publisher node -->
     <node pkg="nodelet"
           type="nodelet"
           name="main_camera"
           args="load opencv_camera/VideoStream standalone_nodelet"
           output="screen"
-          ns="rosbot/main_camera/">
+          ns="rosbot">
         <remap from="/opencv_camera/image_raw" to="/rosbot/main_camera/image_raw" />
         <remap from="/opencv_camera/camera_info" to="/rosbot/main_camera/camera_info" />
     </node>
