@@ -2,6 +2,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include <nodelet/nodelet.h>
 #include <boost/assign/list_of.hpp>
+#include <opencv2/photo/cuda.hpp>
 
 namespace opencv_camera {
 
@@ -73,9 +74,36 @@ sensor_msgs::ImagePtr Camera::Capture() {
     ros::shutdown();
     exit(1);
   }
-  msg_ = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame_).toImageMsg();
-  msg_->header.stamp = ros::Time::now();
+
+  if (!IsFrameBlurred()) {
+    DenoiseFrame();
+    msg_ = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame_).toImageMsg();
+    msg_->header.stamp = ros::Time::now();
+  } else {
+    msg_.reset();
+  }
   return msg_;
+}
+
+bool Camera::IsFrameBlurred() const {
+  if (params_.blurred_threshold > 0) {
+    cv::Laplacian(frame_, frame_laplacian_, 1);
+    cv::meanStdDev(frame_laplacian_, mean_, stddev_);
+    auto variance = stddev_.at<double>(0);
+    if (variance >= params_.blurred_threshold)
+      return false;
+    else
+      return true;
+  } else {
+    return false;
+  }
+}
+
+void Camera::DenoiseFrame() {
+  if (params_.denoise_factor > 0) {
+    cv::cuda::fastNlMeansDenoisingColored(frame_, frame_,
+                                          params_.denoise_factor, 10);
+  }
 }
 
 const CameraParams& Camera::GetParams() const {

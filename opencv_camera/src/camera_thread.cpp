@@ -34,8 +34,10 @@ void CameraThread::ThreadFunc() {
   bool done = false;
   while (!done) {
     auto img_msg = camera_->Capture();
-    while (!queue_->push(img_msg)) {
-      std::this_thread::sleep_for(consumer_timeout);
+    if (img_msg) {
+      while (!queue_->push(img_msg)) {
+        std::this_thread::sleep_for(consumer_timeout);
+      }
     }
     done = stop_flag_.load();
   }

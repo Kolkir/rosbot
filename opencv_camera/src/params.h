@@ -13,6 +13,8 @@ struct CameraParams {
   double frame_rate = 0.0;
   int buffer_size = 100;
   int out_queue_size = 30;
+  double denoise_factor = 10.0;
+  double blurred_threshold = 800.0;
 };
 
 CameraParams ReadCameraParams(ros::NodeHandle& node_handle);

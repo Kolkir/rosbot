@@ -22,11 +22,16 @@ class Camera {
 
  private:
   void MakeDefaultInfo();
+  bool IsFrameBlurred() const;
+  void DenoiseFrame();
 
  private:
   CameraParams params_;
   cv::VideoCapture capture_;
   cv::Mat frame_;
+  cv::Mat frame_laplacian_;
+  cv::Mat mean_;
+  cv::Mat stddev_;
   sensor_msgs::ImagePtr msg_;
   sensor_msgs::CameraInfo cam_info_msg_;
 };
