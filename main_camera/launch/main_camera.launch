@@ -7,7 +7,9 @@
     <param name="/opencv_camera/frame_width" type="double" value="1280" />
     <param name="/opencv_camera/frame_height" type="double" value="960" />
     <param name="/opencv_camera/frame_rate" type="double" value="7.5" />
-    <param name="/opencv_camera/buffer_size" type="int" value="50" />
+    <param name="/opencv_camera/buffer_size" type="int" value="5" />
+    <param name="/opencv_camera/blur_threshold" type="double" value="12" />
+    <param name="/opencv_camera/denoise_factor" type="double" value="7" />
     <!-- Publisher node -->
     <node pkg="nodelet"
           type="nodelet"

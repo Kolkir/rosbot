@@ -2,7 +2,6 @@
 #include <cv_bridge/cv_bridge.h>
 #include <nodelet/nodelet.h>
 #include <boost/assign/list_of.hpp>
-#include <opencv2/photo/cuda.hpp>
 
 namespace opencv_camera {
 
@@ -27,10 +26,11 @@ Camera::Camera(CameraParams params) : params_(params) {
     ROS_ERROR_STREAM("Failed to set frame rate " << params_.frame_rate);
   }
 
-  Capture();
+  while (!Capture()) {
+  }
 
-  ROS_WARN_STREAM("Frame width = " << frame_.cols
-                                   << " height = " << frame_.rows);
+  ROS_WARN_STREAM("Frame width = " << frames_.back().cols
+                                   << " height = " << frames_.back().rows);
 
   MakeDefaultInfo();
 }
@@ -68,16 +68,19 @@ void Camera::MakeDefaultInfo() {
 }
 
 sensor_msgs::ImagePtr Camera::Capture() {
-  capture_ >> frame_;
-  if (frame_.empty()) {
+  cv::Mat frame;
+  capture_ >> frame;
+  if (frame.empty()) {
     ROS_ERROR_STREAM("Failed to capture image!");
     ros::shutdown();
     exit(1);
+  } else {
+    frames_.push_back(frame);
   }
 
-  if (!IsFrameBlurred()) {
-    DenoiseFrame();
-    msg_ = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame_).toImageMsg();
+  if (!IsFrameBlurred(frame)) {
+    frame = DenoiseFrame();
+    msg_ = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
     msg_->header.stamp = ros::Time::now();
   } else {
     msg_.reset();
@@ -85,25 +88,43 @@ sensor_msgs::ImagePtr Camera::Capture() {
   return msg_;
 }
 
-bool Camera::IsFrameBlurred() const {
-  if (params_.blurred_threshold > 0) {
-    cv::Laplacian(frame_, frame_laplacian_, 1);
+bool Camera::IsFrameBlurred(cv::Mat frame) {
+  if (params_.blur_threshold > 0) {
+    cv::split(frame, frame_channels_);
+    cv::Laplacian(frame_channels_[1], frame_laplacian_, CV_16S);
     cv::meanStdDev(frame_laplacian_, mean_, stddev_);
     auto variance = stddev_.at<double>(0);
-    if (variance >= params_.blurred_threshold)
+    if (variance >= params_.blur_threshold) {
       return false;
-    else
+    } else {
+      ROS_INFO_STREAM("Skipping blurred frame var = "
+                      << variance
+                      << " < threshold = " << params_.blur_threshold);
       return true;
+    }
   } else {
     return false;
   }
 }
 
-void Camera::DenoiseFrame() {
-  if (params_.denoise_factor > 0) {
-    cv::cuda::fastNlMeansDenoisingColored(frame_, frame_,
-                                          params_.denoise_factor, 10);
+cv::Mat Camera::DenoiseFrame() {
+  if (params_.denoise_factor > 0 && frames_.size() == 3) {
+    // cv::fastNlMeansDenoisingColored(frame_, frame_, params_.denoise_factor,
+    // 10);
+    //    std::vector<cv::Mat> frames(frames_.begin(), frames_.end());
+    //    cv::fastNlMeansDenoisingMulti(frames, filtered_frame_, 1, 3,
+    //                                  params_.denoise_factor);
+
+    //+
+    cv::bilateralFilter(frames_.back(), filtered_frame_, -1,
+                        params_.denoise_factor, params_.denoise_factor);
+
+    //    cv::Size kernel_size(params_.denoise_factor, params_.denoise_factor);
+    //    cv::GaussianBlur(frames_.back(), filtered_frame_, kernel_size, 0, 0);
+  } else {
+    filtered_frame_ = frames_.back();
   }
+  return filtered_frame_;
 }
 
 const CameraParams& Camera::GetParams() const {

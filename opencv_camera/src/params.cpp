@@ -60,6 +60,20 @@ CameraParams ReadCameraParams(ros::NodeHandle& node_handle) {
     ROS_WARN_STREAM("Frame rate param = " << params.frame_rate);
   }
 
+  if (!node_handle.param("/opencv_camera/blur_threshold", params.blur_threshold,
+                         8.0)) {
+    ROS_ERROR_STREAM("Using default blur threshold param");
+  } else {
+    ROS_WARN_STREAM("Blur threshold param = " << params.blur_threshold);
+  }
+
+  if (!node_handle.param("/opencv_camera/denoise_factor", params.denoise_factor,
+                         10.0)) {
+    ROS_ERROR_STREAM("Using default denoise factor param");
+  } else {
+    ROS_WARN_STREAM("Denoise factor param = " << params.denoise_factor);
+  }
+
   return params;
 }
 

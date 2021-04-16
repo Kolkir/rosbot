@@ -3,7 +3,9 @@
 
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
+#include <boost/circular_buffer.hpp>
 #include <opencv2/opencv.hpp>
+#include <vector>
 #include "params.h"
 
 namespace opencv_camera {
@@ -22,13 +24,15 @@ class Camera {
 
  private:
   void MakeDefaultInfo();
-  bool IsFrameBlurred() const;
-  void DenoiseFrame();
+  bool IsFrameBlurred(cv::Mat frame);
+  cv::Mat DenoiseFrame();
 
  private:
   CameraParams params_;
   cv::VideoCapture capture_;
-  cv::Mat frame_;
+  cv::Mat filtered_frame_;
+  boost::circular_buffer<cv::Mat> frames_{3};
+  std::vector<cv::Mat> frame_channels_;
   cv::Mat frame_laplacian_;
   cv::Mat mean_;
   cv::Mat stddev_;
