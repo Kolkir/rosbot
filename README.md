@@ -1,19 +1,18 @@
 # rosbot
 
-<img src="docs/robot1_low.jpg" width="320">
+<img src="docs/bot_view_3.jpg" width="320"> <img src="docs/bot_view_2.jpg" width="320"> <img src="docs/bot_view_1.jpg" width="320">
 
-With this project I'm learning ROS and want to create differential wheeled robot. It should consists of:
+This is the implementation of a robotic platform with monocular SLAM navigation. The main aim of this work is to improve feature matching algorithms used for camera positioning in a SLAM pipeline. The recent experiments are about using deep learning for SLAM, especially using the [Local Feature Matching with Transformers](https://github.com/Kolkir/Coarse_LoFTR_TRT) for camera positioning.
 
-1. Two 28BYJ-48 Stepper Motors with ULN2003 Drivers
-2. OrangePi board
+Differential wheeled robot platform is based on the following hardware:
+
+1. NVIDIA Jetson Nano 2Gb
+2. Two 28BYJ-48 Stepper Motors with ULN2003 Drivers
 3. One usb-camera
 4. Powerbank
 
-Software for main computation should work on the desktop and I plan to use OrangePi board only for dispatching control commands to motors and for sending camera images. 
+And as a software platform I use ROS.
 
-## Development plan:
+SLAM example:
 
-1. Create robot platform - done
-2. Create ROS based software for tele-navigation - in progress
-3. SLAM
-4. Autonomus navigation system 
+<img src="docs/robot_mapping_test.gif">
